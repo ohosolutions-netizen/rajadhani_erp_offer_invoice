@@ -1,0 +1,38 @@
+{
+  "locale": [
+    "en"
+  ],
+  "service": "ERP",
+  "whiteListedDomains": [
+    "https://www.zohoapis.in"
+  ],
+  "modules": {
+    "widgets": [
+      {
+        "location": "invoice.details.button",
+        "name": "Rajadhani Edit Invoice",
+        "url": "/app/widget.html",
+        "logo": "/app/img/logo.svg",
+        "widget_type": "modal"
+      }
+    ]
+  },
+  "config": [],
+  "usedConnections": [
+    {
+      "connectionLinkName": "erp_admin",
+      "connectionName": "erp_admin",
+      "serviceName": "zoho_erp",
+      "userAccess": true,
+      "isUserDefinedService": false,
+      "sharedBy": "60087827925",
+      "scope": [
+        "ERP.invoices.ALL",
+        "ERP.contacts.READ",
+        "ERP.items.ALL",
+        "ERP.settings.READ",
+        "ERP.users.ALL"
+      ]
+    }
+  ]
+}

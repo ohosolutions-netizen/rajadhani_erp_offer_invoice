@@ -1,0 +1,11 @@
+const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
+const root=path.resolve(__dirname,'..'); process.chdir(root);
+const manifest=JSON.parse(fs.readFileSync('plugin-manifest.json'));
+if(manifest.modules.widgets.length!==1 || manifest.modules.widgets[0].location!=='invoice.details.button' || manifest.modules.widgets[0].widget_type!=='modal')throw Error('Invalid edit widget placement');
+for(const file of ['app/widget.html','app/config.json','app/js/app.js','app/js/edit.js','app/js/erp.js','app/js/core.js','app/css/style.css','app/img/logo.svg'])if(!fs.existsSync(file))throw Error(`Missing ${file}`);
+fs.mkdirSync('dist',{recursive:true});
+for(const name of ['RajadhaniInvoiceEdit.zip','RajadhaniInvoiceEditSource.zip'])fs.rmSync(`dist/${name}`,{force:true});
+execFileSync('zip',['-qr','dist/RajadhaniInvoiceEdit.zip','app','plugin-manifest.json','-x','*/.DS_Store']);
+execFileSync('zip',['-qr','dist/RajadhaniInvoiceEditSource.zip','app','plugin-manifest.json','package.json','package-lock.json','scripts','tests','playwright.config.cjs','README.md','.gitignore','-x','*/.DS_Store']);
+for(const name of ['RajadhaniInvoiceEdit.zip','RajadhaniInvoiceEditSource.zip'])execFileSync('unzip',['-tq',`dist/${name}`],{stdio:'inherit'});
+console.log('Built separate upload and source ZIPs in dist/.');

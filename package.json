@@ -1,0 +1,19 @@
+{
+  "name": "rajadhani-erp",
+  "version": "1.0.0",
+  "description": "Rajadhani sales invoice widget for Zoho ERP",
+  "main": "index.js",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "node --test tests/core.test.mjs && playwright test",
+    "preview": "python3 -m http.server 5179 --bind 127.0.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "zoho-extension-toolkit": "^1.0.29"
+  }
+}

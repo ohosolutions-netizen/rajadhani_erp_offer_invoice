@@ -1,0 +1,20 @@
+{
+  "name": "rajadhani-invoice-edit",
+  "version": "1.0.0",
+  "description": "Edit existing Zoho ERP invoices",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:ui": "playwright test",
+    "build": "node scripts/build.cjs",
+    "preview": "python3 -m http.server 5180 --bind 127.0.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "zoho-extension-toolkit": "^1.0.29"
+  }
+}

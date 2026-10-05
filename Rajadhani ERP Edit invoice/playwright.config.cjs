@@ -1,0 +1,1 @@
+module.exports={testDir:'./tests',testMatch:'**/*.spec.cjs',use:{baseURL:'http://127.0.0.1:5180',viewport:{width:1200,height:740}},webServer:{command:'python3 -m http.server 5180 --bind 127.0.0.1',url:'http://127.0.0.1:5180/app/widget.html',reuseExistingServer:false},workers:1,reporter:'list'};

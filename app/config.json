@@ -1,0 +1,65 @@
+{
+  "apiBase": "https://www.zohoapis.in/erp/v3",
+  "connectionLinkName": "erp_admin",
+  "organizationId": "",
+  "customFields": {
+    "billType": {
+      "label": "Bill type",
+      "id": "",
+      "required": false
+    },
+    "saleType": {
+      "label": "Type",
+      "id": "",
+      "required": false
+    },
+    "billCreatedBy": {
+      "label": "Bill created by",
+      "id": "",
+      "required": false
+    },
+    "transport": {
+      "label": "Transport",
+      "id": "",
+      "required": false
+    },
+    "agent": {
+      "label": "Agent name",
+      "id": "",
+      "required": false
+    },
+    "vehicle": {
+      "label": "Vehicle number",
+      "id": "",
+      "required": false
+    },
+    "whatsapp": {
+      "label": "WhatsApp number",
+      "id": "",
+      "required": false
+    },
+    "mobile": {
+      "label": "Mobile number",
+      "id": "",
+      "required": false
+    },
+    "shippingPhone": {
+      "label": "Shipping phone",
+      "id": "",
+      "required": false
+    },
+    "pending": {
+      "label": "Invoice pending",
+      "id": "",
+      "required": false
+    }
+  },
+  "itemFields": {
+    "mu": "",
+    "ratio": ""
+  },
+  "lookupSources": {},
+  "requireSalesperson": true,
+  "requireLocation": false,
+  "invoiceQuantityMode": "pieces"
+}
