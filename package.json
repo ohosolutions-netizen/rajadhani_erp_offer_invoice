@@ -6,7 +6,10 @@
   "scripts": {
     "build": "node scripts/build.cjs",
     "test": "node --test tests/core.test.mjs && playwright test",
-    "preview": "python3 -m http.server 5179 --bind 127.0.0.1"
+    "preview": "python3 -m http.server 5179 --bind 127.0.0.1",
+    "zet:validate": "zet validate",
+    "zet:pack": "zet pack",
+    "zet:run": "zet run"
   },
   "keywords": [],
   "author": "",
