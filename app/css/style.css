@@ -33,9 +33,9 @@ main{max-width:none;width:100%;height:100vh;overflow-y:auto;overflow-x:hidden;pa
 .breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
 .notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(760px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:12px 18px;font-size:14px;line-height:1.45;font-weight:650;text-align:center;border-radius:10px;box-shadow:0 12px 35px #26382f30}
 .notice.success{display:none}
-form,.workspace{height:100%;min-height:0}
+form{min-height:100%;height:auto}.workspace{min-height:100%;height:auto}
 .workspace{grid-template-columns:minmax(0,1fr) 330px;gap:8px;align-items:stretch}
-.maincolumn{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;min-height:0}
+.maincolumn{display:grid;grid-template-rows:auto auto;gap:8px;min-height:0}
 .card{border-radius:5px;box-shadow:none}
 .sectionheading{min-height:28px;padding:5px 8px;background:#d7f0f4;border-bottom-color:#b6dfe6}
 .sectionheading h2{font-size:12px}.step{width:18px;height:18px;border-radius:4px;font-size:9px;background:#fff}.subtle{display:none}
@@ -52,9 +52,9 @@ h3{font-size:10px}.address{font-size:10px;line-height:1.25;min-height:28px;max-h
 .editaddress:focus{background:#fff;border:1px solid #dce2de;padding:3px 5px;box-shadow:none}
 .compact{margin-top:3px}.compact input{min-height:23px;padding:3px 5px;font-size:10px}
 .more{border-top:0;margin-top:0;padding-top:0}.more summary{display:none}.more .grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:0}
-.itemsCard{min-height:0;display:flex;flex-direction:column}.itemsCard .cardbody{padding:6px 8px}
+.itemsCard{min-height:calc(100vh - 210px);display:flex;flex-direction:column}.itemsCard .cardbody{padding:6px 8px}
 .itemsearchrow{gap:6px}.itemsearchrow .button{min-height:25px;padding:3px 8px;font-size:10px}
-.tablewrap{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;border-top:1px solid #dce2de;scrollbar-gutter:stable}
+.tablewrap{flex:1;min-height:260px;overflow-y:visible;overflow-x:hidden;border-top:1px solid #dce2de;scrollbar-gutter:stable}
 table{table-layout:fixed;font-size:10px;width:100%;white-space:normal}
 th{position:sticky;top:0;z-index:1;padding:4px 4px;font-size:9px;background:#ffd0ad;color:#1f3636;border-color:#d8b08e;overflow:hidden;text-overflow:ellipsis}
 td{height:29px;padding:3px 4px;border-color:#d8ded9;overflow:hidden;text-overflow:ellipsis}

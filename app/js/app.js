@@ -206,7 +206,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
   const close=()=>{box.hidden=true;input.setAttribute('aria-expanded','false');};
   async function run(append=false, autoChoose=false) {
     clearTimeout(timer);
-    const token=++sequence; if(!append){page=1;query=input.value.trim();box.innerHTML='<p>Searching ERP…</p>';}
+    const token=++sequence; if(!append){page=1;query=input.value.trim();if(!query){box.replaceChildren();close();return;}box.innerHTML='<p>Searching ERP…</p>';}
     box.hidden=false;input.setAttribute('aria-expanded','true');
     try { const r=await search(query,page);if(token!==sequence)return;const records=(r[key]||[]).filter(x=>x.status!=='inactive' && x.is_active!==false);
       if (autoChoose) {
@@ -219,8 +219,8 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
       const ctx=Array.isArray(r.page_context)?r.page_context[0]:r.page_context;if(ctx?.has_more_page){const b=document.createElement('button');b.type='button';b.dataset.more='true';b.textContent='Load more results →';b.onclick=()=>{page++;run(true);};box.append(b);}
     }catch(e){if(token===sequence)box.innerHTML=`<p>${esc(e.message)}</p>`;}
   }
-  input.addEventListener('input',()=>{sequence++;clearTimeout(timer);box.replaceChildren();close();timer=setTimeout(()=>run(),280);});
-  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'||(e.key==='Tab'&&options.scanOnEnter&&input.value.trim())){e.preventDefault();const text=input.value.trim();if(options.scanImmediate){close();await options.scanImmediate(text);return;}const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
+  input.addEventListener('input',()=>{sequence++;clearTimeout(timer);box.replaceChildren();close();if(!input.value.trim())return;timer=setTimeout(()=>run(),280);});
+  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(input.value.trim()){if(box.hidden)run();else box.querySelector('button')?.focus();}}if(e.key==='Enter'||(e.key==='Tab'&&options.scanOnEnter&&input.value.trim())){e.preventDefault();const text=input.value.trim();if(options.scanImmediate){sequence++;clearTimeout(timer);box.replaceChildren();close();await options.scanImmediate(text);return;}const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
   box.addEventListener('keydown',e=>{const buttons=[...box.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(index+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}if(e.key==='Escape'){close();input.focus();}});
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==input)close();});
   return run;
@@ -331,7 +331,7 @@ async function scanItemText(text) {
   finally{pending(-1);}
 }
 const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true,scanImmediate:async text=>{try{await scanItemText(text);}catch(e){error(e);}}});
-$('browseItems').onclick=()=>{$('itemSearch').focus();browse();};
+$('browseItems').onclick=()=>{$('itemSearch').focus();if($('itemSearch').value.trim())browse();};
 $('salesOrder').addEventListener('change',async()=>{
   if(!$('salesOrder').value)return;
   if(!window.RAJADHANI_PREVIEW_CONFIG){notice('Sales-order import needs confirmation of whether ERP order quantities represent sets or pieces. Add items directly for now.');$('salesOrder').value='';return;}
