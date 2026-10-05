@@ -389,6 +389,30 @@ function pending(delta) { state.pendingOperations += delta; $('saveButton').disa
 const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: state.currency }).format(Number.isFinite(n) ? n : 0);
 function notice(message, kind = '') { $('notice').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
 function error(err) { notice(err.message || String(err), 'error'); }
+function invoiceListUrl() {
+  const orgId = encodeURIComponent(config.organizationId || api.organization?.organization_id || '');
+  return orgId ? `https://erp.zoho.in/app/${orgId}#/invoices?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D` : 'https://erp.zoho.in/app';
+}
+async function exitAfterSave() {
+  await new Promise(resolve => setTimeout(resolve, 900));
+  try {
+    if (window.ZFAPPS?.closeModal) {
+      await window.ZFAPPS.closeModal();
+      return;
+    }
+  } catch { /* Continue with browser/webtab fallbacks. */ }
+  try {
+    window.open('', '_self');
+    window.close();
+  } catch { /* Some browsers block closing tabs not opened by script. */ }
+  setTimeout(() => {
+    if (document.visibilityState === 'hidden') return;
+    const url = invoiceListUrl();
+    try { window.top.location.href = url; return; } catch { /* Cross-origin webtabs can block top navigation. */ }
+    try { window.parent.location.href = url; return; } catch { /* Fall through to iframe/current-page navigation. */ }
+    window.location.href = url;
+  }, 700);
+}
 function fieldMarkup(key) {
   const f = config.customFields[key];
   const type = /phone|mobile|whatsapp/i.test(key) ? 'tel' : 'text';
@@ -704,6 +728,7 @@ $('confirmSave').onclick=async()=>{
     notice(`Invoice ${result.invoice.invoice_number || result.invoice.invoice_id} saved in ERP (${result.invoice.status || 'created'}). Final total: ${money(Number(result.invoice.total))}.`,'success');
     $('invoiceForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);
     await api.refreshInvoices();
+    exitAfterSave();
   }catch(e){if(e.apiRejected){$('saveStatus').textContent=e.message;$('confirmSave').disabled=false;}else{state.uncertain=true;$('saveButton').disabled=true;$('saveStatus').textContent='Could not confirm the result. Check the ERP invoice list before starting again to avoid a duplicate. '+e.message;}}finally{state.busy=false;}
 };
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('customerSearch').focus();}});
