@@ -29,7 +29,7 @@ body{background:#eef2ef;font-size:11px;line-height:1.25}
 .compacttools{position:absolute;right:8px;top:6px;z-index:5;height:auto;border:0;background:transparent;padding:0;gap:4px}
 .compacttools .status,.compacttools .avatar{display:none}
 .compacttools .iconbutton{font-size:16px;width:24px;height:24px;padding:0;background:#fff;border:1px solid #dce2db;border-radius:5px}
-main{max-width:none;width:100%;height:100vh;overflow:hidden;padding:8px}
+main{max-width:none;width:100%;height:100vh;overflow-y:auto;overflow-x:hidden;padding:8px;scroll-behavior:smooth}
 .resetmini{position:absolute;right:40px;top:6px;z-index:6;min-height:24px;padding:3px 8px;font-size:10px;background:#fff}
 .breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
 .notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(760px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:12px 18px;font-size:14px;line-height:1.45;font-weight:650;text-align:center;border-radius:10px;box-shadow:0 12px 35px #26382f30}
@@ -107,157 +107,6 @@ dialog{border-radius:7px}
   th:nth-child(8),td:nth-child(8){width:10%}
   th:nth-child(9),td:nth-child(9){width:9%}
 }
-
-/* Clean centered modal theme */
-:root{
-  --ink:#0f172a;
-  --muted:#64748b;
-  --line:#d9e2ec;
-  --orange:#2563eb;
-  --soft:#f8fafc;
-  --green:#166534;
-  --shadow:0 24px 70px rgba(15,23,42,.22);
-  --panel:#ffffff;
-  --panel-soft:#f8fafc;
-  --header:#eaf2ff;
-  --header-border:#bfdbfe;
-  --table-head:#e2e8f0;
-  --table-head-text:#1e293b;
-}
-html{background:#dbe4ef}
-body{
-  background:radial-gradient(circle at 20% 0,#eef6ff 0,#dbe4ef 38%,#cbd5e1 100%);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
-}
-main{
-  width:calc(100vw - 28px);
-  height:calc(100vh - 28px);
-  max-width:1680px;
-  margin:14px auto;
-  padding:10px;
-  background:#f8fafc;
-  border:1px solid rgba(148,163,184,.55);
-  border-radius:16px;
-  box-shadow:var(--shadow);
-}
-.card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:12px;
-  box-shadow:0 2px 10px rgba(15,23,42,.04);
-  overflow:hidden;
-}
-.sectionheading{
-  background:linear-gradient(180deg,#eff6ff,#eaf2ff);
-  border-bottom:1px solid var(--header-border);
-  color:#0f172a;
-}
-.sectionheading h2{color:#0f172a;font-weight:750;letter-spacing:-.01em}
-.step{
-  background:#ffffff;
-  color:#1d4ed8;
-  border:1px solid #bfdbfe;
-  font-weight:800;
-}
-.count{background:#dbeafe;color:#1d4ed8;font-weight:800}
-.field label,.discountbox>label,h3,.sideblocktitle{color:#1e293b;font-weight:750}
-input,select,textarea,.searchbox{
-  background:#ffffff;
-  border-color:#cbd5e1;
-  color:#0f172a;
-  border-radius:8px;
-}
-input::placeholder,textarea::placeholder{color:#94a3b8}
-input:focus,select:focus,textarea:focus,.searchbox:focus-within{
-  border-color:#2563eb;
-  box-shadow:0 0 0 3px rgba(37,99,235,.15);
-}
-input[readonly],input:disabled,select:disabled{background:#f1f5f9;color:#64748b}
-.addresscard{
-  background:#f8fafc;
-  border-color:#dbe3ee;
-  color:#334155;
-}
-.address{color:#475569}
-.button{
-  background:#ffffff;
-  border-color:#cbd5e1;
-  color:#1e293b;
-  border-radius:9px;
-}
-.button:hover{background:#f1f5f9}
-.primary,#saveButton{
-  background:#2563eb;
-  border-color:#2563eb;
-  color:#ffffff;
-  box-shadow:0 10px 24px rgba(37,99,235,.22);
-}
-.primary:hover,#saveButton:hover{background:#1d4ed8}
-.resetmini,.compacttools .iconbutton{
-  background:#ffffff;
-  border-color:#cbd5e1;
-  color:#334155;
-  box-shadow:0 4px 14px rgba(15,23,42,.08);
-}
-.tablewrap{border-top-color:#dbe3ee;background:#ffffff}
-table{color:#0f172a}
-th{
-  background:var(--table-head)!important;
-  color:var(--table-head-text)!important;
-  border-color:#cbd5e1!important;
-  font-weight:800;
-  text-transform:none;
-}
-td{border-color:#e2e8f0;color:#0f172a;background:#ffffff}
-tbody tr:nth-child(even) td{background:#f8fafc}
-td.itemname strong{color:#0f172a;font-weight:800}
-td small{color:#64748b!important}
-.tablefooter{
-  background:#f8fafc;
-  color:#64748b;
-  border-top:1px solid #e2e8f0;
-}
-.tablefooter span:first-child{color:#1d4ed8;font-weight:800}
-.summary .cardbody{background:#ffffff}
-.summaryrow{color:#475569;border-bottom:1px solid #eef2f7;padding-bottom:4px}
-.summaryrow strong,.summaryrow>span:last-child{color:#0f172a;font-weight:800}
-.billamount{
-  background:linear-gradient(180deg,#eff6ff,#dbeafe);
-  border-color:#bfdbfe;
-  color:#0f172a;
-}
-.billamount strong{color:#1e3a8a}
-.totaldetail{color:#64748b;font-weight:650}
-.discountinput input,.discountinput select{border-color:#cbd5e1}
-.notice{
-  background:#fffbeb;
-  color:#92400e;
-  border:1px solid #f59e0b;
-  box-shadow:0 18px 45px rgba(15,23,42,.22);
-}
-.notice.error{background:#fef2f2;color:#991b1b;border-color:#fca5a5}
-.notice.success{background:#ecfdf5;color:#065f46;border-color:#86efac}
-.results{
-  border-color:#cbd5e1;
-  box-shadow:0 18px 45px rgba(15,23,42,.18);
-}
-.results button{color:#0f172a}
-.results button:hover,.results button:focus{background:#eff6ff}
-.loadingline td{background:#fff7ed!important}.loadingnote{color:#c2410c!important}
-.notfoundline td{background:#fef2f2!important;border-color:#fecaca!important}
-.notfoundline strong{color:#991b1b}.notfoundline small{color:#b91c1c!important}.notfoundline .remove{color:#dc2626}
-dialog{
-  border-color:#dbe3ee;
-  border-radius:16px;
-  box-shadow:0 24px 80px rgba(15,23,42,.28);
-}
-dialog::backdrop{background:rgba(15,23,42,.55);backdrop-filter:blur(3px)}
-#reviewContent .summaryrow{border-bottom-color:#e2e8f0}
-#saveButton{box-shadow:0 -8px 18px rgba(248,250,252,.9),0 10px 24px rgba(37,99,235,.24)}
-@media(max-width:720px){
-  main{width:100vw;height:auto;min-height:100vh;margin:0;border-radius:0;border:0}
-}
 </style><script src="https://static.zohocdn.com/zohofinance/v1.0/zf_sdk.js" defer></script></head>
 <body>
 <header class="topbar compacttools"><span id="connectionStatus" class="status">Connecting to ERP</span><button type="button" class="iconbutton" id="settingsButton" aria-label="Connection settings">⚙</button><span class="avatar" id="avatar">R</span></header>
@@ -269,7 +118,7 @@ dialog::backdrop{background:rgba(15,23,42,.55);backdrop-filter:blur(3px)}
 <div class="grid three"><div class="field"><label for="location">Business location</label><select id="location"><option value="">Organization default</option></select></div><div class="field"><label for="placeOfSupply">Place of supply <em>*</em></label><input id="placeOfSupply" maxlength="2" placeholder="State code from ERP, e.g. KL" required></div><div class="field"><label for="gstNumber">Customer GSTIN</label><input id="gstNumber" readonly placeholder="From customer" class="mutedinput"></div></div>
 <div class="addressgrid"><div class="addresscard"><div class="addressheading"><h3>Billing address</h3><span class="tinybadge">ERP RECORD</span></div><p id="billingAddress" class="address">Select a customer to load their billing address.</p></div><div class="addresscard"><div class="addressheading"><h3>Shipping address</h3><label class="check"><input type="checkbox" id="sameAsBilling"> Same as billing</label></div><textarea id="shippingAddress" class="address editaddress" rows="3" placeholder="Tick Same as billing to copy billing address, or enter shipping address manually."></textarea><div class="field compact"><label for="shippingGst">Shipping GSTIN</label><input id="shippingGst" placeholder="From customer"></div></div></div>
 <details class="more" open><summary>Contact & billing details <span>Required business fields</span></summary><div class="grid three" id="billingFields"></div></details></div></section>
-<section class="card itemsCard"><div class="sectionheading"><div><span class="step">02</span><h2>Invoice items</h2><span id="lineCount" class="count">0</span></div><span class="subtle">Prices & stock from ERP</span></div><div class="cardbody"><div class="itemsearchrow"><div class="searchfield grow"><label class="sr-only" for="itemSearch">Search items</label><div class="searchbox"><span>⌕</span><input id="itemSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="itemResults" placeholder="Search an item, SKU or scan a barcode…"><kbd>↵</kbd></div><div id="itemResults" class="results" role="listbox" hidden></div></div><button type="button" class="button" id="browseItems">＋ Browse items</button></div></div>
+<section class="card itemsCard" id="invoiceItemsCard"><div class="sectionheading"><div><span class="step">02</span><h2>Invoice items</h2><span id="lineCount" class="count">0</span></div><span class="subtle">Prices & stock from ERP</span></div><div class="cardbody"><div class="itemsearchrow"><div class="searchfield grow"><label class="sr-only" for="itemSearch">Search items</label><div class="searchbox"><span>⌕</span><input id="itemSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="itemResults" placeholder="Search an item, SKU or scan a barcode…"><kbd>↵</kbd></div><div id="itemResults" class="results" role="listbox" hidden></div></div><button type="button" class="button" id="browseItems">＋ Browse items</button></div></div>
 <div class="tablewrap"><table><thead><tr><th>#</th><th class="itemname">Item details</th><th>Stock / UoM</th><th>Pieces / pack</th><th>Order qty</th><th>P. qty</th><th>Rate / piece</th><th>Tax</th><th class="right">Amount</th><th></th></tr></thead><tbody id="lineItems"></tbody></table><div id="emptyItems" class="empty"><div class="emptyicon">▧</div><h3>Your invoice starts here</h3><p>Find an item above to add it to this invoice.</p><span>Search by name or SKU · Barcode scanner ready</span></div></div><div class="tablefooter"><span id="qtySummary">0 items · 0 total quantity</span><span>Amount = P. qty × rate · Tax exclusive</span></div></section>
 </div><aside><section class="card summary"><div class="sectionheading"><h2>Subtotals & delivery</h2><span class="currency" id="currencyLabel">INR</span></div><div class="cardbody"><div class="sideblocktitle">Transporter information</div><div class="grid twoslim" id="dispatchFields"></div><div class="field remarks"><label for="notes">Remarks</label><textarea id="notes" rows="2" placeholder="Delivery instructions or invoice note"></textarea></div><div class="sideblocktitle summarytitle">Summary information</div><div class="summarygrid"><div class="summaryrow"><span>Total</span><strong id="subtotal">₹0.00</strong></div><div class="discountbox"><label for="discount">Discount</label><div class="discountinput"><input id="discount" type="number" min="0" value="0" step="0.01" aria-label="Discount value"><select id="discountType" aria-label="Discount type"><option value="percent">%</option><option value="amount">Amount</option></select></div></div><div class="summaryrow"><span>Discount Amount</span><span class="green" id="discountAmount">− ₹0.00</span></div><div class="summaryrow"><span>Tax Amount</span><span id="taxTotal">₹0.00</span></div><div id="taxBreakdown"></div><div class="summaryrow"><span>Round off</span><span id="roundValue">₹0.00</span></div><div class="summaryrow billamount"><span>Bill Amount</span><strong id="grandTotal">₹0.00</strong></div></div><small id="totalDetail" class="totaldetail">0 items in this invoice</small><button class="button primary full" id="saveButton" type="submit">Submit invoice <span>→</span></button></div></section></aside></div></form><footer><span id="footerStatus">Zoho ERP widget</span></footer></main>
 <dialog id="reviewDialog"><div class="dialogheading"><div><div class="eyebrow">READY FOR A QUICK CHECK</div><h2>Review your invoice</h2></div><button type="button" class="iconbutton" data-close="reviewDialog" aria-label="Close review">×</button></div><div id="reviewContent"></div><div class="dialogactions"><button type="button" class="button" data-close="reviewDialog">Back to editing</button><button type="button" class="button primary" id="confirmSave">Save draft to ERP →</button></div><p id="saveStatus" role="status"></p></dialog>
@@ -639,12 +488,18 @@ async function loadPendingSO(line) {
   state.pendingSO = { item: null, rows: [], loading: false, error: '' };
 }
 
-function renderLines(focusIndex = null) {
+function focusInvoiceItems(focusIndex = null) {
+  requestAnimationFrame(() => {
+    $('invoiceItemsCard')?.scrollIntoView({block:'start', behavior:'smooth'});
+    if (focusIndex != null) $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'});
+  });
+}
+function renderLines(focusIndex = null, focusItems = false) {
   $('emptyItems').hidden = !!state.lines.length;
   $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="8"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(pieceQuantity(l)*l.rate))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
   totals();
   if (!state.lines.length) loadPendingSO(null);
-  if (focusIndex != null) requestAnimationFrame(() => $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'}));
+  if (focusIndex != null || focusItems) focusInvoiceItems(focusIndex);
 }
 $('lineItems').addEventListener('input', e => {
   const {row,field} = e.target.dataset; if (row == null || !field) return;
@@ -673,7 +528,7 @@ $('sameAsBilling').addEventListener('change', addresses);
 function selectOptions(id, records, idKey, nameKey, placeholder) { const current=$(id).value;$(id).replaceChildren(new Option(placeholder,''),...records.filter(r=>r.status!=='inactive'&&r.is_active!==false).map(r=>new Option(r[nameKey] || r.name || String(r[idKey]),String(r[idKey]))));if(records.some(r=>String(r[idKey])===current))$(id).value=current; }
 async function chooseCustomer(record) {
   const version=++state.customerVersion;
-  state.customer=null; state.lines=[]; renderLines(); $('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Loading sales orders…',''));
+  state.customer=null; $('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Loading sales orders…',''));
   $('customerSearch').value=record.contact_name; $('customerHint').textContent='Loading customer details…';
   pending(1);
   try {
@@ -725,7 +580,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
   return run;
 }
 searchable('customerSearch','customerResults',(q,p)=>api.searchCustomers(q,p),'contacts',c=>[c.contact_name,[c.company_name,c.mobile || c.email].filter(Boolean).join(' · ')],chooseCustomer);
-$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;state.lines=[];renderLines();$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';$('paymentTerms').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
+$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';$('paymentTerms').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
 function normalizeTax(t){return {id:String(t.tax_id || t.tax_group_id || t.id || ''),name:t.tax_name || t.tax_group_name || t.name || t.tax_name_formatted || t.text,percentage:Number(t.tax_percentage ?? t.tax_group_percentage ?? t.percentage ?? 0)};}
 function itemTax(item) {
   const preferences = item.item_tax_preferences || [];
@@ -802,18 +657,18 @@ async function addItem(record, options={}) {
   if(!state.customer)throw new Error('Select a customer before adding items.');
   let placeholder=options.placeholder || null;
   const existingIndex=state.lines.findIndex(l=>String(l.item_id)===String(record.item_id)&&!l.salesorder_item_id&&!l.loading);
-  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
+  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex,true);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
   const version=state.customerVersion;
-  if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index);$('itemSearch').focus();}}
-  else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1);$('itemSearch').focus();}
+  if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index,true);$('itemSearch').focus();}}
+  else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1,true);$('itemSearch').focus();}
   pending(1);
   try{const item=await fullItem(record);if(version!==state.customerVersion)return;
     const line=await lineFromItem(item);if(line.tracked)throw new Error('This item requires batch, serial or storage allocation. Please use the native ERP invoice editor.');
     const loadingIndex=placeholder ? state.lines.indexOf(placeholder) : -1;
     const duplicateIndex=state.lines.findIndex((l,i)=>i!==loadingIndex&&String(l.item_id)===line.item_id&&!l.salesorder_item_id&&!l.loading);
-    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex);loadPendingSO(state.lines[duplicateIndex]);}
-    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex);loadPendingSO(state.lines[loadingIndex]);}
-    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
+    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex,true);loadPendingSO(state.lines[duplicateIndex]);}
+    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex,true);loadPendingSO(state.lines[loadingIndex]);}
+    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex,true);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
   }catch(e){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}}throw e;}finally{pending(-1);}
 }
 async function scanItemText(text) {
@@ -826,7 +681,7 @@ async function scanItemText(text) {
     const record=scannerMatch(records,text);
     if(!record)throw new Error(`No ERP item found for ${text}.`);
     await addItem(record,{placeholder,fast:true});
-  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...placeholder,name:'Item not found',loading:false,notFound:true,error:e.message};renderLines(index);}$('itemSearch').focus();throw e;}
+  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...placeholder,name:'Item not found',loading:false,notFound:true,error:e.message};renderLines(index,true);}$('itemSearch').focus();throw e;}
   finally{pending(-1);}
 }
 const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true,scanImmediate:async text=>{try{await scanItemText(text);}catch(e){error(e);}}});
@@ -838,7 +693,7 @@ $('salesOrder').addEventListener('change',async()=>{
   const version=state.customerVersion;pending(1);$('salesOrder').disabled=true;
   try{const order=await api.salesOrder($('salesOrder').value);if(version!==state.customerVersion)return;if(String(order.customer_id)!==String(state.customer?.contact_id))throw new Error('Sales order belongs to a different customer.');
     const lines=[];for(const l of order.line_items||[]){const remaining=Number(l.quantity)-Number(l.quantity_invoiced||0);if(remaining<=0)continue;const item=await fullItem(l);lines.push(await lineFromItem({...item,...l,custom_fields:item.custom_fields,custom_field_hash:item.custom_field_hash},{quantity:remaining,salesorder_item_id:l.line_item_id}));}
-    if(version!==state.customerVersion)return;state.lines=lines;if(order.salesperson_id)$('salesperson').value=String(order.salesperson_id);renderLines();if(state.lines[0])loadPendingSO(state.lines[0]);notice('Unbilled sales order items imported. Review quantities, rates and taxes.');
+    if(version!==state.customerVersion)return;state.lines=lines;if(order.salesperson_id)$('salesperson').value=String(order.salesperson_id);renderLines(null,true);if(state.lines[0])loadPendingSO(state.lines[0]);notice('Unbilled sales order items imported. Review quantities, rates and taxes.');
   }catch(e){error(e);}finally{pending(-1);if(version===state.customerVersion)$('salesOrder').disabled=false;}
 });
 async function loadLookups() {

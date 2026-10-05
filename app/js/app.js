@@ -134,12 +134,18 @@ async function loadPendingSO(line) {
   state.pendingSO = { item: null, rows: [], loading: false, error: '' };
 }
 
-function renderLines(focusIndex = null) {
+function focusInvoiceItems(focusIndex = null) {
+  requestAnimationFrame(() => {
+    $('invoiceItemsCard')?.scrollIntoView({block:'start', behavior:'smooth'});
+    if (focusIndex != null) $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'});
+  });
+}
+function renderLines(focusIndex = null, focusItems = false) {
   $('emptyItems').hidden = !!state.lines.length;
   $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="8"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(pieceQuantity(l)*l.rate))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
   totals();
   if (!state.lines.length) loadPendingSO(null);
-  if (focusIndex != null) requestAnimationFrame(() => $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'}));
+  if (focusIndex != null || focusItems) focusInvoiceItems(focusIndex);
 }
 $('lineItems').addEventListener('input', e => {
   const {row,field} = e.target.dataset; if (row == null || !field) return;
@@ -168,7 +174,7 @@ $('sameAsBilling').addEventListener('change', addresses);
 function selectOptions(id, records, idKey, nameKey, placeholder) { const current=$(id).value;$(id).replaceChildren(new Option(placeholder,''),...records.filter(r=>r.status!=='inactive'&&r.is_active!==false).map(r=>new Option(r[nameKey] || r.name || String(r[idKey]),String(r[idKey]))));if(records.some(r=>String(r[idKey])===current))$(id).value=current; }
 async function chooseCustomer(record) {
   const version=++state.customerVersion;
-  state.customer=null; state.lines=[]; renderLines(); $('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Loading sales orders…',''));
+  state.customer=null; $('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Loading sales orders…',''));
   $('customerSearch').value=record.contact_name; $('customerHint').textContent='Loading customer details…';
   pending(1);
   try {
@@ -220,7 +226,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
   return run;
 }
 searchable('customerSearch','customerResults',(q,p)=>api.searchCustomers(q,p),'contacts',c=>[c.contact_name,[c.company_name,c.mobile || c.email].filter(Boolean).join(' · ')],chooseCustomer);
-$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;state.lines=[];renderLines();$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';$('paymentTerms').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
+$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';$('paymentTerms').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
 function normalizeTax(t){return {id:String(t.tax_id || t.tax_group_id || t.id || ''),name:t.tax_name || t.tax_group_name || t.name || t.tax_name_formatted || t.text,percentage:Number(t.tax_percentage ?? t.tax_group_percentage ?? t.percentage ?? 0)};}
 function itemTax(item) {
   const preferences = item.item_tax_preferences || [];
@@ -297,18 +303,18 @@ async function addItem(record, options={}) {
   if(!state.customer)throw new Error('Select a customer before adding items.');
   let placeholder=options.placeholder || null;
   const existingIndex=state.lines.findIndex(l=>String(l.item_id)===String(record.item_id)&&!l.salesorder_item_id&&!l.loading);
-  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
+  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex,true);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
   const version=state.customerVersion;
-  if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index);$('itemSearch').focus();}}
-  else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1);$('itemSearch').focus();}
+  if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index,true);$('itemSearch').focus();}}
+  else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1,true);$('itemSearch').focus();}
   pending(1);
   try{const item=await fullItem(record);if(version!==state.customerVersion)return;
     const line=await lineFromItem(item);if(line.tracked)throw new Error('This item requires batch, serial or storage allocation. Please use the native ERP invoice editor.');
     const loadingIndex=placeholder ? state.lines.indexOf(placeholder) : -1;
     const duplicateIndex=state.lines.findIndex((l,i)=>i!==loadingIndex&&String(l.item_id)===line.item_id&&!l.salesorder_item_id&&!l.loading);
-    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex);loadPendingSO(state.lines[duplicateIndex]);}
-    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex);loadPendingSO(state.lines[loadingIndex]);}
-    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
+    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex,true);loadPendingSO(state.lines[duplicateIndex]);}
+    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex,true);loadPendingSO(state.lines[loadingIndex]);}
+    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex,true);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
   }catch(e){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}}throw e;}finally{pending(-1);}
 }
 async function scanItemText(text) {
@@ -321,7 +327,7 @@ async function scanItemText(text) {
     const record=scannerMatch(records,text);
     if(!record)throw new Error(`No ERP item found for ${text}.`);
     await addItem(record,{placeholder,fast:true});
-  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...placeholder,name:'Item not found',loading:false,notFound:true,error:e.message};renderLines(index);}$('itemSearch').focus();throw e;}
+  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...placeholder,name:'Item not found',loading:false,notFound:true,error:e.message};renderLines(index,true);}$('itemSearch').focus();throw e;}
   finally{pending(-1);}
 }
 const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true,scanImmediate:async text=>{try{await scanItemText(text);}catch(e){error(e);}}});
@@ -333,7 +339,7 @@ $('salesOrder').addEventListener('change',async()=>{
   const version=state.customerVersion;pending(1);$('salesOrder').disabled=true;
   try{const order=await api.salesOrder($('salesOrder').value);if(version!==state.customerVersion)return;if(String(order.customer_id)!==String(state.customer?.contact_id))throw new Error('Sales order belongs to a different customer.');
     const lines=[];for(const l of order.line_items||[]){const remaining=Number(l.quantity)-Number(l.quantity_invoiced||0);if(remaining<=0)continue;const item=await fullItem(l);lines.push(await lineFromItem({...item,...l,custom_fields:item.custom_fields,custom_field_hash:item.custom_field_hash},{quantity:remaining,salesorder_item_id:l.line_item_id}));}
-    if(version!==state.customerVersion)return;state.lines=lines;if(order.salesperson_id)$('salesperson').value=String(order.salesperson_id);renderLines();if(state.lines[0])loadPendingSO(state.lines[0]);notice('Unbilled sales order items imported. Review quantities, rates and taxes.');
+    if(version!==state.customerVersion)return;state.lines=lines;if(order.salesperson_id)$('salesperson').value=String(order.salesperson_id);renderLines(null,true);if(state.lines[0])loadPendingSO(state.lines[0]);notice('Unbilled sales order items imported. Review quantities, rates and taxes.');
   }catch(e){error(e);}finally{pending(-1);if(version===state.customerVersion)$('salesOrder').disabled=false;}
 });
 async function loadLookups() {
