@@ -270,7 +270,7 @@ function validateInvoice(state, values, config) {
   });
   for (const [key, mapping] of Object.entries(config.customFields)) {
     const value = values.custom[key];
-    if (mapping.id && mapping.required && (value === '' || value == null)) errors.push(`${mapping.label} is required.`);
+    if (mapping.required && (value === '' || value == null)) errors.push(`${mapping.label} is required.`);
   }
   return [...new Set(errors)];
 }
@@ -409,7 +409,7 @@ class ERP {
 
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const config = {"apiBase":"https://www.zohoapis.in/erp/v3","connectionLinkName":"erp_admin","organizationId":"","customFields":{"billType":{"label":"Bill type","id":"","required":false},"saleType":{"label":"Type","id":"","required":false},"billCreatedBy":{"label":"Bill created by","id":"","required":false},"transport":{"label":"Transport","id":"","required":false},"agent":{"label":"Agent name","id":"","required":false},"vehicle":{"label":"Vehicle number","id":"","required":false},"whatsapp":{"label":"WhatsApp number","id":"","required":false},"mobile":{"label":"Mobile number","id":"","required":false},"shippingPhone":{"label":"Shipping phone","id":"","required":false}},"itemFields":{"mu":"","ratio":""},"lookupSources":{},"requireSalesperson":true,"requireLocation":false,"invoiceQuantityMode":"pieces"};
+const config = {"apiBase":"https://www.zohoapis.in/erp/v3","connectionLinkName":"erp_admin","organizationId":"","customFields":{"billType":{"label":"Bill type","id":"","required":true},"billCreatedBy":{"label":"Bill created by","id":"","required":false},"transport":{"label":"Transport","id":"","required":false},"agent":{"label":"Agent name","id":"","required":false},"vehicle":{"label":"Vehicle number","id":"","required":false},"whatsapp":{"label":"WhatsApp number","id":"","required":false},"mobile":{"label":"Mobile number","id":"","required":false},"shippingPhone":{"label":"Shipping phone","id":"","required":false}},"itemFields":{"mu":"","ratio":""},"lookupSources":{},"requireSalesperson":true,"requireLocation":false,"invoiceQuantityMode":"pieces"};
 if (window.RAJADHANI_PREVIEW_CONFIG) Object.assign(config, window.RAJADHANI_PREVIEW_CONFIG);
 const api = new ERP(config, window.ZFAPPS);
 const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: false, saved: false, allowClose: false, uncertain: false, customerVersion: 0, pendingOperations: 0, pendingSO: { item: null, rows: [], loading: false, error: '' } };
@@ -456,7 +456,7 @@ function fieldMarkup(key) {
   const input = fixedOptions ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option>${fixedOptions.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>` : config.lookupSources[key] ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option></select>` : `<input id="cf_${key}" type="${type}" ${f.required ? 'required' : ''} placeholder="${key === 'billCreatedBy' ? 'Current ERP user' : esc(f.label)}">`;
   return `<div class="field"><label for="cf_${key}">${esc(f.label)} ${f.required && f.id ? '<em>*</em>' : ''}</label>${input}${!f.id ? '<small class="mappinghint">Not sent to ERP yet</small>' : ''}</div>`;
 }
-$('billingFields').innerHTML = ['billType','saleType','billCreatedBy','mobile','whatsapp','shippingPhone'].map(fieldMarkup).join('');
+$('billingFields').innerHTML = ['billType','billCreatedBy','mobile','whatsapp','shippingPhone'].map(fieldMarkup).join('');
 $('dispatchFields').innerHTML = ['transport','agent','vehicle'].map(fieldMarkup).join('');
 $('invoiceDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 function getValues() {

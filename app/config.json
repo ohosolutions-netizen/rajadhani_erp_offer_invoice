@@ -6,12 +6,7 @@
     "billType": {
       "label": "Bill type",
       "id": "",
-      "required": false
-    },
-    "saleType": {
-      "label": "Type",
-      "id": "",
-      "required": false
+      "required": true
     },
     "billCreatedBy": {
       "label": "Bill created by",

@@ -91,7 +91,7 @@ export function validateInvoice(state, values, config) {
   });
   for (const [key, mapping] of Object.entries(config.customFields)) {
     const value = values.custom[key];
-    if (mapping.id && mapping.required && (value === '' || value == null)) errors.push(`${mapping.label} is required.`);
+    if (mapping.required && (value === '' || value == null)) errors.push(`${mapping.label} is required.`);
   }
   return [...new Set(errors)];
 }

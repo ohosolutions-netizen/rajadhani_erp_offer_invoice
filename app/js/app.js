@@ -49,7 +49,7 @@ function fieldMarkup(key) {
   const input = fixedOptions ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option>${fixedOptions.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>` : config.lookupSources[key] ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option></select>` : `<input id="cf_${key}" type="${type}" ${f.required ? 'required' : ''} placeholder="${key === 'billCreatedBy' ? 'Current ERP user' : esc(f.label)}">`;
   return `<div class="field"><label for="cf_${key}">${esc(f.label)} ${f.required && f.id ? '<em>*</em>' : ''}</label>${input}${!f.id ? '<small class="mappinghint">Not sent to ERP yet</small>' : ''}</div>`;
 }
-$('billingFields').innerHTML = ['billType','saleType','billCreatedBy','mobile','whatsapp','shippingPhone'].map(fieldMarkup).join('');
+$('billingFields').innerHTML = ['billType','billCreatedBy','mobile','whatsapp','shippingPhone'].map(fieldMarkup).join('');
 $('dispatchFields').innerHTML = ['transport','agent','vehicle'].map(fieldMarkup).join('');
 $('invoiceDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 function getValues() {
