@@ -78,7 +78,6 @@ export function validateInvoice(state, values, config) {
   if (state.lines.some(l => l.notFound)) errors.push('Remove or correct scanned items marked Item not found.');
   if (config.requireSalesperson && !values.salesperson_id) errors.push('Select a salesperson.');
   if (config.requireLocation && !values.location_id) errors.push('Select a business location.');
-  if (!Number.isInteger(values.payment_terms) || values.payment_terms < 0) errors.push('Payment terms must be a whole number of days, zero or greater.');
   if (!Number.isFinite(values.discount) || values.discount < 0 || (values.discountType === 'percent' && values.discount > 100)) errors.push('Enter a valid discount (0–100 for a percentage).');
   const total = calculate(state.lines, values.discount, values.discountType, values.rounded);
   if (total.taxable < 0) errors.push('Discount cannot exceed the subtotal.');
@@ -99,7 +98,7 @@ export function makePayload(state, values, config) {
   const totals = calculate(state.lines, values.discount, values.discountType, values.rounded);
   const payload = {
     customer_id: String(state.customer.contact_id), date: values.date,
-    place_of_supply: values.place_of_supply, payment_terms: values.payment_terms,
+    place_of_supply: values.place_of_supply,
     line_items: state.lines.filter(l => !l.notFound).map((l, index) => ({
       item_id: String(l.item_id), quantity: config.invoiceQuantityMode === 'pieces' ? pieceQuantity(l) : l.quantity, rate: config.invoiceQuantityMode === 'order' ? l.rate * (l.pieces ?? 1) : l.rate, item_order: index + 1,
       ...(l.tax ? { tax_id: String(l.tax.id) } : { tax_exemption_id: l.tax_exemption_id }),

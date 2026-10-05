@@ -14,7 +14,7 @@ function error(err) { notice(err.message || String(err), 'error'); }
 function hasUnsavedWork() {
   if (state.saved || state.allowClose) return false;
   if (state.customer || state.lines.length) return true;
-  const ids = ['customerSearch','itemSearch','placeOfSupply','paymentTerms','shippingGst','shippingAddress','notes','discount'];
+  const ids = ['customerSearch','itemSearch','placeOfSupply','shippingGst','shippingAddress','notes','discount'];
   if (ids.some(id => String($(id)?.value || '').trim() && String($(id)?.value || '').trim() !== '0')) return true;
   return Object.keys(config.customFields).some(k => String($(`cf_${k}`)?.value || '').trim());
 }
@@ -53,7 +53,7 @@ $('billingFields').innerHTML = ['billType','billCreatedBy','mobile','whatsapp','
 $('dispatchFields').innerHTML = ['transport','agent','vehicle'].map(fieldMarkup).join('');
 $('invoiceDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 function getValues() {
-  return { date: $('invoiceDate').value, place_of_supply: $('placeOfSupply').value.trim().toUpperCase(), payment_terms: $('paymentTerms').value === '' ? 0 : Number($('paymentTerms').value), salesperson_id: $('salesperson').value, location_id: $('location').value,
+  return { date: $('invoiceDate').value, place_of_supply: $('placeOfSupply').value.trim().toUpperCase(), salesperson_id: $('salesperson').value, location_id: $('location').value,
     shipping_gst_no: $('shippingGst').value.trim(), shipping_address: $('shippingAddress').value.trim(), notes: $('notes').value.trim(), sameAsBilling: $('sameAsBilling').checked,
     discount: Number($('discount').value), discountType: $('discountType').value, rounded: true,
     custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, $(`cf_${k}`)?.value?.trim?.() ?? ''])) };
@@ -185,7 +185,7 @@ async function chooseCustomer(record) {
     state.customer=c;state.currency=c.currency_code || api.organization?.currency_code || 'INR';$('currencyLabel').textContent=state.currency;
     $('customerSearch').value=c.contact_name; $('customerHint').textContent=[c.company_name,c.email].filter(Boolean).join(' · ') || 'Customer loaded from ERP';
     $('gstNumber').value=c.gst_no || ''; $('shippingGst').value=c.shipping_gst_no || '';
-    $('placeOfSupply').value=c.place_of_contact || c.place_of_supply || ''; $('paymentTerms').value=c.payment_terms ?? 0;
+    $('placeOfSupply').value=c.place_of_contact || c.place_of_supply || '';
     $('cf_mobile').value=c.mobile || c.contact_persons?.find(p=>p.is_primary_contact)?.mobile || c.phone || '';
     $('cf_shippingPhone').value=c.shipping_address?.phone || '';
     for(const [k,m] of Object.entries(config.customFields)) { const source=(c.custom_fields||[]).find(f=>m.customerApiName && f.api_name===m.customerApiName); if(source && $(`cf_${k}`))$(`cf_${k}`).value=source.value ?? ''; }
@@ -226,7 +226,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
   return run;
 }
 searchable('customerSearch','customerResults',(q,p)=>api.searchCustomers(q,p),'contacts',c=>[c.contact_name,[c.company_name,c.mobile || c.email].filter(Boolean).join(' · ')],chooseCustomer);
-$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';$('paymentTerms').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
+$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
 function normalizeTax(t){return {id:String(t.tax_id || t.tax_group_id || t.id || ''),name:t.tax_name || t.tax_group_name || t.name || t.tax_name_formatted || t.text,percentage:Number(t.tax_percentage ?? t.tax_group_percentage ?? t.percentage ?? 0)};}
 function itemTax(item) {
   const preferences = item.item_tax_preferences || [];

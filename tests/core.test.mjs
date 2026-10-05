@@ -6,7 +6,7 @@ const {calculate,validateInvoice,makePayload,decodeResponse}=core;
 const lines=[{item_id:'1234567890123456789',quantity:2,rate:100,tax:{id:'t18',name:'GST 18',percentage:18}},{item_id:'2',quantity:1,rate:50,tax:{id:'t5',name:'GST 5',percentage:5}}];
 const state={customer:{contact_id:'9876543210987654321',billing_address:{city:'Kochi'},shipping_address:{city:'Thrissur'}},lines};
 const config={invoiceQuantityMode:'pieces',customFields:{transport:{id:'cf1',label:'Transport',required:true}},requireSalesperson:true};
-const values={date:'2026-09-17',place_of_supply:'KL',payment_terms:30,salesperson_id:'s1',discount:10,discountType:'percent',rounded:false,custom:{transport:'Own delivery'},notes:'Test'};
+const values={date:'2026-09-17',place_of_supply:'KL',salesperson_id:'s1',discount:10,discountType:'percent',rounded:false,custom:{transport:'Own delivery'},notes:'Test'};
 test('mixed tax rates and invoice percentage discount',()=>{const t=calculate(lines,10);assert.equal(t.subtotal,250);assert.equal(t.discount,25);assert.equal(t.tax,34.65);assert.equal(t.total,259.65);});
 test('absolute discount and whole-unit round off',()=>{const t=calculate(lines,25,'amount',true);assert.equal(t.total,260);assert.equal(t.adjustment,.35);});
 test('zero subtotal remains finite',()=>assert.equal(calculate([],0).total,0));
