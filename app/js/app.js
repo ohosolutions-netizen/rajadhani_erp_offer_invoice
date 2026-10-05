@@ -221,7 +221,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
   const scannerMatch = (records, text) => {
     const needle = normalized(text);
     const exact = records.find(r => [r.sku, r.item_code, r.item_code_formatted, r.barcode, r.ean, r.upc, r.name].some(v => normalized(v) === needle));
-    return exact || (records.length === 1 ? records[0] : null);
+    return exact || records[0] || null;
   };
   async function run(append=false, autoChoose=false) {
     clearTimeout(timer);
