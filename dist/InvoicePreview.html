@@ -593,15 +593,15 @@ async function chooseCustomer(record) {
     requestAnimationFrame(() => $('itemSearch').focus());
   }catch(e){if(version===state.customerVersion){error(e);$('customerHint').textContent=state.customer?'Customer loaded; sales order lookup failed.':'Could not load customer. Search again.';$('salesOrder').replaceChildren(new Option('Sales orders unavailable',''));}}finally{pending(-1);}
 }
+const normalized = value => String(value || '').trim().toLocaleLowerCase();
+const scannerMatch = (records, text) => {
+  const needle = normalized(text);
+  const exact = records.find(r => [r.sku, r.item_code, r.item_code_formatted, r.barcode, r.ean, r.upc, r.name].some(v => normalized(v) === needle));
+  return exact || records[0] || null;
+};
 function searchable(inputId, resultsId, search, key, describe, choose, options = {}) {
   const input=$(inputId), box=$(resultsId); let timer, sequence=0, page=1, query='';
   const close=()=>{box.hidden=true;input.setAttribute('aria-expanded','false');};
-  const normalized = value => String(value || '').trim().toLocaleLowerCase();
-  const scannerMatch = (records, text) => {
-    const needle = normalized(text);
-    const exact = records.find(r => [r.sku, r.item_code, r.item_code_formatted, r.barcode, r.ean, r.upc, r.name].some(v => normalized(v) === needle));
-    return exact || records[0] || null;
-  };
   async function run(append=false, autoChoose=false) {
     clearTimeout(timer);
     const token=++sequence; if(!append){page=1;query=input.value.trim();box.innerHTML='<p>Searching ERP…</p>';}
@@ -618,7 +618,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
     }catch(e){if(token===sequence)box.innerHTML=`<p>${esc(e.message)}</p>`;}
   }
   input.addEventListener('input',()=>{sequence++;clearTimeout(timer);box.replaceChildren();close();timer=setTimeout(()=>run(),280);});
-  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'||(e.key==='Tab'&&options.scanOnEnter&&input.value.trim())){e.preventDefault();const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
+  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'||(e.key==='Tab'&&options.scanOnEnter&&input.value.trim())){e.preventDefault();const text=input.value.trim();if(options.scanImmediate){close();await options.scanImmediate(text);return;}const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
   box.addEventListener('keydown',e=>{const buttons=[...box.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(index+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}if(e.key==='Escape'){close();input.focus();}});
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==input)close();});
   return run;
@@ -694,12 +694,17 @@ async function lineFromItem(item, extra={}) {
 function quickLineFromRecord(record) {
   return {item_id:String(record.item_id),name:record.name || record.item_name || record.sku || 'Scanned item',sku:record.sku || record.item_code,hsn_or_sac:record.hsn_or_sac,stock:record.available_stock ?? record.stock_on_hand,unit:record.unit,rate:Number(record.rate||0),quantity:1,tax:null,tax_exemption_id:record.tax_exemption_id,mu:record.unit || '',pieces:null,loading:true};
 }
+function quickLineFromScan(text) {
+  return {item_id:`scan:${Date.now()}:${text}`,name:`Scanning ${text}`,sku:text,hsn_or_sac:'',stock:'—',unit:'',rate:0,quantity:1,tax:null,tax_exemption_id:null,mu:'',pieces:null,loading:true,scanPlaceholder:true};
+}
 async function addItem(record, options={}) {
   if(!state.customer)throw new Error('Select a customer before adding items.');
+  let placeholder=options.placeholder || null;
   const existingIndex=state.lines.findIndex(l=>String(l.item_id)===String(record.item_id)&&!l.salesorder_item_id&&!l.loading);
-  if(existingIndex>=0){state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
-  const version=state.customerVersion;let placeholder=null;
-  if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1);$('itemSearch').focus();}
+  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
+  const version=state.customerVersion;
+  if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index);$('itemSearch').focus();}}
+  else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1);$('itemSearch').focus();}
   pending(1);
   try{const item=await fullItem(record);if(version!==state.customerVersion)return;
     const line=await lineFromItem(item);if(line.tracked)throw new Error('This item requires batch, serial or storage allocation. Please use the native ERP invoice editor.');
@@ -710,7 +715,20 @@ async function addItem(record, options={}) {
     else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
   }catch(e){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}}throw e;}finally{pending(-1);}
 }
-const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true});
+async function scanItemText(text) {
+  if(!state.customer)throw new Error('Select a customer before adding items.');
+  const placeholder=quickLineFromScan(text);
+  state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1);$('itemSearch').focus();pending(1);
+  try{
+    const r=await api.searchItems(text,1);
+    const records=(r.items||[]).filter(x=>x.status!=='inactive' && x.is_active!==false);
+    const record=scannerMatch(records,text);
+    if(!record)throw new Error(`No ERP item found for ${text}.`);
+    await addItem(record,{placeholder,fast:true});
+  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}$('itemSearch').focus();throw e;}
+  finally{pending(-1);}
+}
+const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true,scanImmediate:async text=>{try{await scanItemText(text);}catch(e){error(e);}}});
 $('browseItems').onclick=()=>{$('itemSearch').focus();browse();};
 $('salesOrder').addEventListener('change',async()=>{
   if(!$('salesOrder').value)return;
