@@ -388,12 +388,19 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;',
 const config = {"apiBase":"https://www.zohoapis.in/erp/v3","connectionLinkName":"erp_admin","organizationId":"","customFields":{"billType":{"label":"Bill type","id":"","required":false},"saleType":{"label":"Type","id":"","required":false},"billCreatedBy":{"label":"Bill created by","id":"","required":false},"transport":{"label":"Transport","id":"","required":false},"agent":{"label":"Agent name","id":"","required":false},"vehicle":{"label":"Vehicle number","id":"","required":false},"whatsapp":{"label":"WhatsApp number","id":"","required":false},"mobile":{"label":"Mobile number","id":"","required":false},"shippingPhone":{"label":"Shipping phone","id":"","required":false},"pending":{"label":"Invoice pending","id":"","required":false}},"itemFields":{"mu":"","ratio":""},"lookupSources":{},"requireSalesperson":true,"requireLocation":false,"invoiceQuantityMode":"pieces"};
 if (window.RAJADHANI_PREVIEW_CONFIG) Object.assign(config, window.RAJADHANI_PREVIEW_CONFIG);
 const api = new ERP(config, window.ZFAPPS);
-const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: false, saved: false, uncertain: false, customerVersion: 0, pendingOperations: 0, pendingSO: { item: null, rows: [], loading: false, error: '' } };
+const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: false, saved: false, allowClose: false, uncertain: false, customerVersion: 0, pendingOperations: 0, pendingSO: { item: null, rows: [], loading: false, error: '' } };
 let approvedPayload = null;
 function pending(delta) { state.pendingOperations += delta; $('saveButton').disabled = state.pendingOperations > 0 || state.saved || state.uncertain; }
 const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: state.currency }).format(Number.isFinite(n) ? n : 0);
 function notice(message, kind = '') { $('notice').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
 function error(err) { notice(err.message || String(err), 'error'); }
+function hasUnsavedWork() {
+  if (state.saved || state.allowClose) return false;
+  if (state.customer || state.lines.length) return true;
+  const ids = ['customerSearch','itemSearch','placeOfSupply','paymentTerms','shippingGst','shippingAddress','notes','discount'];
+  if (ids.some(id => String($(id)?.value || '').trim() && String($(id)?.value || '').trim() !== '0')) return true;
+  return Object.keys(config.customFields).some(k => k !== 'pending' && String($(`cf_${k}`)?.value || '').trim()) || $('cf_pending')?.checked || $('roundOff')?.checked;
+}
 function invoiceListUrl() {
   const orgId = encodeURIComponent(config.organizationId || api.organization?.organization_id || '');
   return orgId ? `https://erp.zoho.in/app/${orgId}#/invoices?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D` : 'https://erp.zoho.in/app';
@@ -736,7 +743,7 @@ async function connect() {
 $('settingsButton').onclick=()=>{$('connectionName').value=config.connectionLinkName;$('orgId').value=config.organizationId;$('settingsDialog').showModal();};
 $('connectButton').onclick=async()=>{if(state.lines.length||state.customer){notice('Start over before changing the ERP connection.');$('settingsDialog').close();return;}config.connectionLinkName=$('connectionName').value.trim();config.organizationId=$('orgId').value.trim();$('settingsDialog').close();await connect();};
 for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.dataset.close).close();
-$('resetButton').onclick=()=>$('resetDialog').showModal();$('confirmReset').onclick=()=>location.reload();
+$('resetButton').onclick=()=>$('resetDialog').showModal();$('confirmReset').onclick=()=>{state.allowClose=true;location.reload();};
 $('invoiceForm').addEventListener('submit',e=>{
   e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
   if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
@@ -753,10 +760,11 @@ $('confirmSave').onclick=async()=>{
     notice(`Invoice ${result.invoice.invoice_number || result.invoice.invoice_id} saved in ERP (${result.invoice.status || 'created'}). Final total: ${money(Number(result.invoice.total))}.`,'success');
     $('invoiceForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);
     await api.refreshInvoices();
+    state.allowClose=true;
     exitAfterSave();
   }catch(e){if(e.apiRejected){$('saveStatus').textContent=e.message;$('confirmSave').disabled=false;}else{state.uncertain=true;$('saveButton').disabled=true;$('saveStatus').textContent='Could not confirm the result. Check the ERP invoice list before starting again to avoid a duplicate. '+e.message;}}finally{state.busy=false;}
 };
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('customerSearch').focus();}});
-window.addEventListener('beforeunload',e=>{if(state.lines.length&&!state.saved){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(hasUnsavedWork()){e.preventDefault();e.returnValue='';}});
 renderLines();await connect();
 </script></body></html>
