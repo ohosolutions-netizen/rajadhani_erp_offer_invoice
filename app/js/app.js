@@ -136,14 +136,14 @@ async function loadPendingSO(line) {
 
 function renderLines(focusIndex = null) {
   $('emptyItems').hidden = !!state.lines.length;
-  $('lineItems').innerHTML = state.lines.map((l,i) => `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(pieceQuantity(l)*l.rate))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
+  $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="8"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(pieceQuantity(l)*l.rate))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
   totals();
   if (!state.lines.length) loadPendingSO(null);
   if (focusIndex != null) requestAnimationFrame(() => $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'}));
 }
 $('lineItems').addEventListener('input', e => {
   const {row,field} = e.target.dataset; if (row == null || !field) return;
-  const l=state.lines[Number(row)]; l[field] = field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
+  const l=state.lines[Number(row)]; if (!l || l.notFound) return; l[field] = field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
   document.querySelector(`[data-amount="${row}"]`).textContent = money(pieceQuantity(l)*l.rate);
   document.querySelector(`[data-piece="${row}"]`).textContent = l.pieces ? Math.round(l.pieces*l.quantity*1000)/1000 : '—'; totals();
 });
@@ -156,7 +156,7 @@ $('lineItems').addEventListener('click', e => {
   }
   const b=e.target.closest('[data-remove]'); if (b) { state.lines.splice(Number(b.dataset.remove),1);renderLines(); return; }
   const row=e.target.closest('tr[data-line]');
-  if (row && !e.target.closest('input,select,button')) loadPendingSO(state.lines[Number(row.dataset.line)]);
+  if (row && !e.target.closest('input,select,button')) { const line=state.lines[Number(row.dataset.line)]; if(!line?.notFound) loadPendingSO(line); }
 });
 ['discount','discountType'].forEach(id=>$(id).addEventListener('input',totals));
 function address(a) { return a ? [a.attention,a.address,a.street2,[a.city,a.state,a.zip].filter(Boolean).join(', '),a.country].filter(Boolean).join('\n') || 'No address recorded in ERP.' : 'No address recorded in ERP.'; }
@@ -291,7 +291,7 @@ function quickLineFromRecord(record) {
   return {item_id:String(record.item_id),name:record.name || record.item_name || record.sku || 'Scanned item',sku:record.sku || record.item_code,hsn_or_sac:record.hsn_or_sac,stock:record.available_stock ?? record.stock_on_hand,unit:record.unit,rate:Number(record.rate||0),quantity:1,tax:null,tax_exemption_id:record.tax_exemption_id,mu:record.unit || '',pieces:null,loading:true};
 }
 function quickLineFromScan(text) {
-  return {item_id:`scan:${Date.now()}:${text}`,name:`Scanning ${text}`,sku:text,hsn_or_sac:'',stock:'—',unit:'',rate:0,quantity:1,tax:null,tax_exemption_id:null,mu:'',pieces:null,loading:true,scanPlaceholder:true};
+  return {item_id:`scan:${Date.now()}:${text}`,name:`Scanning ${text}`,sku:text,scanText:text,hsn_or_sac:'',stock:'—',unit:'',rate:0,quantity:1,tax:null,tax_exemption_id:null,mu:'',pieces:null,loading:true,scanPlaceholder:true};
 }
 async function addItem(record, options={}) {
   if(!state.customer)throw new Error('Select a customer before adding items.');
@@ -321,7 +321,7 @@ async function scanItemText(text) {
     const record=scannerMatch(records,text);
     if(!record)throw new Error(`No ERP item found for ${text}.`);
     await addItem(record,{placeholder,fast:true});
-  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}$('itemSearch').focus();throw e;}
+  }catch(e){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...placeholder,name:'Item not found',loading:false,notFound:true,error:e.message};renderLines(index);}$('itemSearch').focus();throw e;}
   finally{pending(-1);}
 }
 const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true,scanImmediate:async text=>{try{await scanItemText(text);}catch(e){error(e);}}});

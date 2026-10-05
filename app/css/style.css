@@ -70,7 +70,7 @@ th:nth-child(9),td:nth-child(9){width:10%}
 th:nth-child(10),td:nth-child(10){width:24px;padding-left:0;padding-right:3px;text-align:center}
 td input,td select{min-height:23px;min-width:0;width:100%;font-size:10px;padding:2px 4px;border-radius:3px}
 td.itemname{overflow:hidden}td.itemname strong{font-size:10px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}td small{font-size:8px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.packingerror{font-size:9px;max-width:none;white-space:normal!important}
-.loadingline{background:#fffaf0}.loadingnote{color:#b7791f!important}
+.loadingline{background:#fffaf0}.loadingnote{color:#b7791f!important}.notfoundline{background:#fff1f1!important;color:#9b1c1c}.notfoundline td{border-color:#f2c6c6}.notfoundline strong{display:block;color:#9b1c1c;font-size:11px}.notfoundline small{display:block;color:#b54d4d;font-size:9px;margin-top:1px;white-space:normal}.notfoundline .remove{color:#b42318}
 .empty{padding:22px 8px}.emptyicon,.empty p,.empty>span{display:none}.empty h3{font-size:11px}
 .tablefooter{padding:5px 8px;font-size:9px;border-radius:0}
 aside{min-height:0}.summary{height:100%;position:static;display:flex;flex-direction:column}

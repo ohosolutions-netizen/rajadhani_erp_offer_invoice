@@ -53,11 +53,12 @@ export function itemPacking(item, fields = {}) {
 }
 export const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
 export function calculate(lines, discount = 0, type = 'percent', rounded = false) {
-  const subtotal = round(lines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
+  const invoiceLines = lines.filter(l => !l.notFound);
+  const subtotal = round(invoiceLines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
   const discountAmount = round(type === 'percent' ? subtotal * discount / 100 : discount);
   const taxable = round(subtotal - discountAmount);
   const taxMap = new Map();
-  const tax = round(lines.reduce((s, l) => {
+  const tax = round(invoiceLines.reduce((s, l) => {
     const base = round(pieceQuantity(l) * l.rate) * (subtotal ? taxable / subtotal : 0);
     const amount = round(base * (l.tax?.percentage || 0) / 100);
     if (l.tax) taxMap.set(l.tax.name, round((taxMap.get(l.tax.name) || 0) + amount));
@@ -72,7 +73,9 @@ export function validateInvoice(state, values, config) {
   if (!state.customer) errors.push('Select a customer from the ERP search results.');
   if (!values.date) errors.push('Choose an invoice date.');
   if (!/^[A-Z]{2}$/.test(values.place_of_supply)) errors.push('Enter a valid two-letter place-of-supply state code.');
-  if (!state.lines.length) errors.push('Add at least one item.');
+  const invoiceLines = state.lines.filter(l => !l.notFound);
+  if (!invoiceLines.length) errors.push('Add at least one item.');
+  if (state.lines.some(l => l.notFound)) errors.push('Remove or correct scanned items marked Item not found.');
   if (config.requireSalesperson && !values.salesperson_id) errors.push('Select a salesperson.');
   if (config.requireLocation && !values.location_id) errors.push('Select a business location.');
   if (!Number.isInteger(values.payment_terms) || values.payment_terms < 0) errors.push('Payment terms must be a whole number of days, zero or greater.');
@@ -80,7 +83,7 @@ export function validateInvoice(state, values, config) {
   const total = calculate(state.lines, values.discount, values.discountType, values.rounded);
   if (total.taxable < 0) errors.push('Discount cannot exceed the subtotal.');
   if (!['pieces','order'].includes(config.invoiceQuantityMode)) errors.push('Confirm how order quantity and P. quantity should be saved to ERP before saving.');
-  state.lines.forEach((line, index) => {
+  invoiceLines.forEach((line, index) => {
     if (line.packingError) errors.push(`Item ${index + 1}: ${line.packingError}`);
     if (!Number.isFinite(line.quantity) || line.quantity <= 0 || !Number.isFinite(line.rate) || line.rate < 0) errors.push(`Item ${index + 1}: enter a positive quantity and a non-negative rate.`);
     if (!line.tax && !line.tax_exemption_id) errors.push(`Item ${index + 1}: choose an ERP tax or use an item with a configured exemption.`);
@@ -97,7 +100,7 @@ export function makePayload(state, values, config) {
   const payload = {
     customer_id: String(state.customer.contact_id), date: values.date,
     place_of_supply: values.place_of_supply, payment_terms: values.payment_terms,
-    line_items: state.lines.map((l, index) => ({
+    line_items: state.lines.filter(l => !l.notFound).map((l, index) => ({
       item_id: String(l.item_id), quantity: config.invoiceQuantityMode === 'pieces' ? pieceQuantity(l) : l.quantity, rate: config.invoiceQuantityMode === 'order' ? l.rate * (l.pieces ?? 1) : l.rate, item_order: index + 1,
       ...(l.tax ? { tax_id: String(l.tax.id) } : { tax_exemption_id: l.tax_exemption_id }),
       ...(l.salesorder_item_id ? { salesorder_item_id: String(l.salesorder_item_id) } : {})

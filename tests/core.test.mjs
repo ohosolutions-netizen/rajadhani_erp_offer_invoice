@@ -15,6 +15,14 @@ test('round off goes down through .49 and up from .50',()=>{
  assert.equal(calculate([{item_id:'x',quantity:1,pieces:1,rate:100.49}],0,'percent',true).total,100);
  assert.equal(calculate([{item_id:'x',quantity:1,pieces:1,rate:100.5}],0,'percent',true).total,101);
 });
+
+test('not found scan rows are ignored in totals and block save until removed',()=>{
+ const notFound={item_id:'scan:x',notFound:true,quantity:1,rate:999,pieces:1};
+ assert.equal(calculate([notFound,...lines]).subtotal,250);
+ const errors=validateInvoice({...state,lines:[notFound]},values,config);
+ assert.ok(errors.some(e=>e.includes('Item not found')));
+ assert.ok(errors.some(e=>e.includes('Add at least one item')));
+});
 test('reject invalid quantities and excessive discounts while allowing unmapped custom fields',()=>{const errors=validateInvoice({...state,lines:[{...lines[0],quantity:0}]},{...values,discount:110},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(errors.some(e=>e.includes('quantity')));assert.ok(errors.some(e=>e.includes('discount')));assert.ok(!errors.some(e=>e.includes('custom-field ID')));});
 test('required custom fields apply only after their ERP field is mapped',()=>{const errors=validateInvoice(state,{...values,custom:{transport:''}},config);assert.ok(errors.some(e=>e.includes('Transport is required')));assert.deepEqual(validateInvoice(state,{...values,custom:{transport:''}},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}}),[]);});
 test('payload preserves IDs, mappings, tax IDs and links without sending email',()=>{const p=makePayload(state,{...values,shipping_address:'Manual shipping'},config);assert.equal(p.customer_id,'9876543210987654321');assert.equal(p.line_items[0].item_id,'1234567890123456789');assert.equal(p.line_items[0].tax_id,'t18');assert.equal(p.discount,'10%');assert.deepEqual(p.custom_fields,[{customfield_id:'cf1',value:'Own delivery'}]);assert.deepEqual(p.shipping_address,{address:'Manual shipping'});assert.equal(p.send,undefined);});
