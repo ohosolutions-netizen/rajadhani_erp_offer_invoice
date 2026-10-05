@@ -239,7 +239,7 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
     }catch(e){if(token===sequence)box.innerHTML=`<p>${esc(e.message)}</p>`;}
   }
   input.addEventListener('input',()=>{sequence++;clearTimeout(timer);box.replaceChildren();close();timer=setTimeout(()=>run(),280);});
-  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'){e.preventDefault();const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
+  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'||(e.key==='Tab'&&options.scanOnEnter&&input.value.trim())){e.preventDefault();const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
   box.addEventListener('keydown',e=>{const buttons=[...box.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(index+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}if(e.key==='Escape'){close();input.focus();}});
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==input)close();});
   return run;
