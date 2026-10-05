@@ -16,7 +16,7 @@ function hasUnsavedWork() {
   if (state.customer || state.lines.length) return true;
   const ids = ['customerSearch','itemSearch','placeOfSupply','paymentTerms','shippingGst','shippingAddress','notes','discount'];
   if (ids.some(id => String($(id)?.value || '').trim() && String($(id)?.value || '').trim() !== '0')) return true;
-  return Object.keys(config.customFields).some(k => k !== 'pending' && String($(`cf_${k}`)?.value || '').trim()) || $('cf_pending')?.checked;
+  return Object.keys(config.customFields).some(k => String($(`cf_${k}`)?.value || '').trim());
 }
 function invoiceListUrl() {
   const orgId = encodeURIComponent(config.organizationId || api.organization?.organization_id || '');
@@ -47,18 +47,16 @@ function fieldMarkup(key) {
   const type = /phone|mobile|whatsapp/i.test(key) ? 'tel' : 'text';
   const fixedOptions = key === 'billType' ? ['Cash','Credit','Credit-Account'] : null;
   const input = fixedOptions ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option>${fixedOptions.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>` : config.lookupSources[key] ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option></select>` : `<input id="cf_${key}" type="${type}" ${f.required ? 'required' : ''} placeholder="${key === 'billCreatedBy' ? 'Current ERP user' : esc(f.label)}">`;
-  if (key === 'pending') return `<label class="check"><input id="cf_pending" type="checkbox"> Invoice pending</label>${!f.id ? '<small class="unmapped">Not sent until mapped</small>' : ''}`;
   return `<div class="field"><label for="cf_${key}">${esc(f.label)} ${f.required && f.id ? '<em>*</em>' : ''}</label>${input}${!f.id ? '<small class="mappinghint">Not sent to ERP yet</small>' : ''}</div>`;
 }
 $('billingFields').innerHTML = ['billType','saleType','billCreatedBy','mobile','whatsapp','shippingPhone'].map(fieldMarkup).join('');
 $('dispatchFields').innerHTML = ['transport','agent','vehicle'].map(fieldMarkup).join('');
-$('pendingField').innerHTML = fieldMarkup('pending');
 $('invoiceDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 function getValues() {
   return { date: $('invoiceDate').value, place_of_supply: $('placeOfSupply').value.trim().toUpperCase(), payment_terms: $('paymentTerms').value === '' ? 0 : Number($('paymentTerms').value), salesperson_id: $('salesperson').value, location_id: $('location').value,
     shipping_gst_no: $('shippingGst').value.trim(), shipping_address: $('shippingAddress').value.trim(), notes: $('notes').value.trim(), sameAsBilling: $('sameAsBilling').checked,
-    discount: Number($('discount').value), discountType: $('discountType').value, rounded: $('roundOff').checked,
-    custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, k === 'pending' ? $('cf_pending').checked : $(`cf_${k}`).value.trim()])) };
+    discount: Number($('discount').value), discountType: $('discountType').value, rounded: true,
+    custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, $(`cf_${k}`)?.value?.trim?.() ?? ''])) };
 }
 function totals() {
   const v = getValues(); const t = calculate(state.lines, v.discount, v.discountType, v.rounded);
@@ -160,7 +158,7 @@ $('lineItems').addEventListener('click', e => {
   const row=e.target.closest('tr[data-line]');
   if (row && !e.target.closest('input,select,button')) loadPendingSO(state.lines[Number(row.dataset.line)]);
 });
-['discount','discountType','roundOff'].forEach(id=>$(id).addEventListener('input',totals));
+['discount','discountType'].forEach(id=>$(id).addEventListener('input',totals));
 function address(a) { return a ? [a.attention,a.address,a.street2,[a.city,a.state,a.zip].filter(Boolean).join(', '),a.country].filter(Boolean).join('\n') || 'No address recorded in ERP.' : 'No address recorded in ERP.'; }
 function addresses() {
   $('billingAddress').textContent=address(state.customer?.billing_address);
@@ -184,7 +182,7 @@ async function chooseCustomer(record) {
     $('placeOfSupply').value=c.place_of_contact || c.place_of_supply || ''; $('paymentTerms').value=c.payment_terms ?? 0;
     $('cf_mobile').value=c.mobile || c.contact_persons?.find(p=>p.is_primary_contact)?.mobile || c.phone || '';
     $('cf_shippingPhone').value=c.shipping_address?.phone || '';
-    for(const [k,m] of Object.entries(config.customFields)) { const source=(c.custom_fields||[]).find(f=>m.customerApiName && f.api_name===m.customerApiName); if(source && k!=='pending')$(`cf_${k}`).value=source.value ?? ''; }
+    for(const [k,m] of Object.entries(config.customFields)) { const source=(c.custom_fields||[]).find(f=>m.customerApiName && f.api_name===m.customerApiName); if(source && $(`cf_${k}`))$(`cf_${k}`).value=source.value ?? ''; }
     addresses();totals();
     const orders=await api.all('/salesorders','salesorders',{customer_id:c.contact_id}); if(version!==state.customerVersion)return;
     selectOptions('salesOrder',orders.filter(o=>['open','confirmed','partially_invoiced'].includes(o.status)),'salesorder_id','salesorder_number','No sales order');$('salesOrder').disabled=false;

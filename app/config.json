@@ -47,11 +47,6 @@
       "label": "Shipping phone",
       "id": "",
       "required": false
-    },
-    "pending": {
-      "label": "Invoice pending",
-      "id": "",
-      "required": false
     }
   },
   "itemFields": {
