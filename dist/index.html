@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Rajadhani · Sales invoice</title><style>:root{--ink:#253b3b;--muted:#778382;--line:#e5eae7;--orange:#d75b32;--soft:#f8f9f6;--green:#477868;--shadow:0 3px 14px #26382f04}*{box-sizing:border-box}body{margin:0;background:#f5f6f2;color:var(--ink);font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}button,input,select,textarea{font:inherit}button,a,input,select,textarea,summary{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}input,select,textarea{width:100%;min-height:40px;border:1px solid #dce2de;border-radius:7px;background:#fff;padding:9px 11px;color:var(--ink);outline:none;transition:border .15s,box-shadow .15s}input::placeholder,textarea::placeholder{color:#9aa4a1}input:focus,select:focus,textarea:focus{border-color:#b78366;box-shadow:0 0 0 3px #d75b3212}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #e79a75;outline-offset:3px}input[type=checkbox]{width:14px;min-height:14px;height:14px;accent-color:var(--orange);margin:0}input[readonly],input:disabled,select:disabled{background:#f6f7f4;color:#81908a}.topbar{height:79px;background:white;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:0 38px}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:#283d35;letter-spacing:2px;font-weight:750;font-size:15px}.brand img{width:35px;height:35px}.brand small{display:block;letter-spacing:2.1px;font-weight:500;font-size:8px;color:#839087;margin-top:2px}.topright{display:flex;align-items:center;gap:20px}.status{font-size:11px;color:var(--green);background:#f0f6ef;border:1px solid #e3eee0;padding:5px 10px;border-radius:20px}.status:before{content:'•';margin-right:6px}.status.offline{background:#fff4e6;color:#a76d29;border-color:#f1e2cc}.avatar{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:#edece4;font-size:11px;font-weight:700}.iconbutton{border:0;background:transparent;color:#6a7871;font-size:23px;padding:0 5px}.button{border:1px solid #dce2db;border-radius:7px;background:white;padding:10px 15px;white-space:nowrap;font-weight:600;font-size:12px;color:var(--ink)}.button:hover{background:#f3f4ee}.primary{background:var(--orange);color:white;border-color:var(--orange);box-shadow:0 3px 6px #d75b3218}.primary:hover{background:#bd4927}.quiet{background:transparent}.full{width:100%;display:flex;justify-content:space-between;align-items:center}.full span{font-size:20px;font-weight:400}main{max-width:1580px;margin:auto;padding:23px 38px 0}.breadcrumb{font-size:11px;color:#859188;display:flex;gap:12px;align-items:center}.breadcrumb b{font-weight:500;color:#566b5e}.breadcrumb span{color:#b9c0b9}.pageheading{display:flex;justify-content:space-between;align-items:center;margin:25px 0 24px}.eyebrow{font-size:9px;letter-spacing:1.8px;color:#97916e;font-weight:650}h1{font-size:29px;line-height:1.3;font-weight:650;letter-spacing:-.8px;margin:6px 0}.pill{display:inline-block;font-size:9px;font-weight:600;letter-spacing:1px;background:#e9ece3;color:#7d896b;border:1px solid #e0e5d7;border-radius:5px;padding:4px 7px;vertical-align:middle;margin-left:10px}p{margin:6px 0;color:var(--muted)}.pageheading p{font-size:12px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 298px;gap:22px;align-items:start}.maincolumn{display:flex;flex-direction:column;gap:20px}.card{background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow)}.sectionheading{min-height:64px;padding:16px 22px;border-bottom:1px solid #edf0ea;display:flex;justify-content:space-between;align-items:center;gap:10px}.sectionheading>div{display:flex;align-items:center;gap:10px}h2{font-size:14px;font-weight:650;margin:0;letter-spacing:-.15px}.step{width:24px;height:24px;border-radius:6px;border:1px solid #e5eadd;background:#f5f7f0;display:grid;place-items:center;color:#788a62;font-size:10px}.subtle{font-size:10px;color:#88948b}.cardbody{padding:21px 22px}.grid{display:grid;gap:17px;margin-bottom:17px}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.customergrid{grid-template-columns:2fr 1fr 1fr}.field{min-width:0}.field label,.discountbox>label{display:block;font-size:11px;font-weight:550;color:#58695f;margin-bottom:7px}.field small{display:block;color:#909b93;font-size:10px;margin-top:6px}em{color:var(--orange);font-style:normal}.searchfield{position:relative}.searchbox{border:1px solid #dce2de;border-radius:7px;display:flex;align-items:center;padding:0 11px;gap:7px;background:white}.searchbox:focus-within{border-color:#b78366;box-shadow:0 0 0 3px #d75b3212}.searchbox>span{font-size:24px;line-height:1;color:#93a097}.searchbox input{border:0;padding-left:0;box-shadow:none!important;min-width:0;background:transparent}kbd{border:1px solid #e5e9e1;border-radius:4px;color:#a0a99d;font:10px -apple-system,sans-serif;white-space:nowrap;padding:1px 4px}.addressgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;border-top:1px solid #edf0ea;padding-top:18px}.addresscard{background:#fafbf8;border:1px solid #e9ede4;padding:14px 15px;border-radius:8px}.addressheading{display:flex;justify-content:space-between;gap:8px;align-items:center}h3{font-size:11px;margin:0;font-weight:600}.tinybadge{font-size:7px;letter-spacing:.7px;color:#899677}.address{white-space:pre-line;font-size:11px;min-height:51px;line-height:1.8;margin:11px 0 5px}.check{display:flex;gap:6px;align-items:center;font-size:10px;color:#71806f;font-weight:400}.compact{margin-top:8px}.compact label{font-size:10px}.compact input{min-height:31px;padding:5px 9px;font-size:11px}.more{border-top:1px solid #edf0ea;margin-top:18px;padding-top:14px}.more summary{font-size:11px;font-weight:600;cursor:pointer}.more summary span{font-weight:400;color:#a1a99d;font-size:10px;margin-left:8px}.more .grid{margin-top:16px;margin-bottom:0}.count{font-size:10px;padding:1px 6px;background:#f1f3ee;border-radius:5px;color:#7c8c7b}.itemsearchrow{display:flex;gap:10px}.grow{flex:1;min-width:0}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}th{background:#f8f9f5;color:#82907e;font-weight:500;font-size:9px;text-align:left;padding:11px 9px;border-top:1px solid #edf0e9;border-bottom:1px solid #edf0e9}th:first-child,td:first-child{padding-left:20px}td{padding:15px 9px;border-bottom:1px solid #edf0e9;vertical-align:middle}td input,td select{min-height:32px;padding:6px;font-size:11px;min-width:65px}td input{width:76px}td select{width:117px}td small{display:block;font-size:9px;color:#9aa496;margin-top:4px}.itemname{min-width:165px}td.itemname{white-space:normal}td.itemname strong{font-size:11px;font-weight:600}.right{text-align:right}.remove{background:none;border:0;color:#a5aca1;font-size:18px}.remove:hover{color:var(--orange)}.empty{text-align:center;padding:33px 10px 40px;color:#8a9782}.emptyicon{font-size:27px;background:#f3f5ed;border:1px solid #e7ecd9;border-radius:11px;width:48px;height:48px;display:grid;place-items:center;margin:0 auto 13px;color:#91a071}.empty h3{font-size:13px;color:#6f7e66}.empty p{font-size:11px}.empty>span{font-size:9px;color:#a8b09e}.tablefooter{display:flex;justify-content:space-between;padding:13px 22px;font-size:9px;color:#919d88;background:#fcfdf9;border-radius:0 0 11px 11px}.tablefooter span:first-child{color:#627959;font-weight:500}.summary{position:sticky;top:20px}.currency{font-size:9px;color:#98a390}.summary .sectionheading{padding:18px}.summary .cardbody{padding:18px}.summaryrow{display:flex;justify-content:space-between;gap:9px;font-size:11px;align-items:center;margin-bottom:16px;color:#7c8976}.summaryrow strong,.summaryrow>span:last-child{color:#4a6150;font-weight:550}.discountbox{border-top:1px solid #edf0e9;padding-top:14px;margin:3px 0 16px}.discountinput{display:flex}.discountinput input{border-radius:6px 0 0 6px;min-width:0;min-height:34px;padding:5px 9px}.discountinput select{width:83px;border-radius:0 6px 6px 0;border-left:0;min-height:34px;padding:5px 9px}.summaryrow .green{color:#668853!important}.grandtotal{background:#f4f6ed;border:1px solid #e4ead8;border-radius:8px;padding:17px;margin:22px 0 17px}.grandtotal>span{display:block;font-size:11px;color:#6d805c}.grandtotal strong{display:block;font-size:30px;letter-spacing:-1px;color:#354e31;margin:5px 0}.grandtotal small{font-size:9px;color:#92a080}.summarynote{text-align:center;font-size:9px;line-height:1.8;margin:12px 0 0;color:#a0a99a}.helpbox{display:flex;gap:10px;padding:20px 8px;font-size:10px}.helpbox>span{font-size:20px;color:#9eaa8a}.helpbox strong{font-weight:550;color:#7e8c70}.helpbox p{font-size:10px;line-height:1.8;color:#9da58f}aside{align-self:stretch}footer{display:flex;gap:18px;align-items:center;padding:26px 0;font-size:9px;color:#a0aa99;letter-spacing:1px}footer>span{letter-spacing:0}footer>span:last-child{margin-left:auto}.notice{padding:13px 16px;background:#fff6e9;color:#8b692f;border:1px solid #f0dfc0;border-radius:8px;margin-bottom:20px;font-size:12px}.notice.success{color:#3e7554;background:#edf8ee;border-color:#d3e9d6}.notice.error{color:#a43e2f;background:#fff2ef;border-color:#efd4cc}.results{position:absolute;top:100%;left:0;right:0;margin-top:5px;background:white;border:1px solid var(--line);box-shadow:0 10px 35px #213e301a;border-radius:8px;z-index:10;max-height:300px;overflow:auto;padding:5px}.results button{display:block;width:100%;border:0;background:white;text-align:left;padding:10px;border-radius:5px;color:var(--ink)}.results button:hover,.results button:focus{background:#f4f5ed;outline:none}.results button span{display:block;font-size:10px;color:#91a085;margin-top:3px}.results p{padding:10px;font-size:11px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}dialog{width:min(560px,92vw);padding:26px;border:1px solid var(--line);border-radius:14px;color:var(--ink);box-shadow:0 25px 100px #263c3c33}dialog::backdrop{background:#23383055;backdrop-filter:blur(3px)}dialog h2{font-size:21px}dialog p{font-size:12px;margin:15px 0}dialog .field{margin:18px 0}.dialogheading{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.dialogactions{display:flex;justify-content:flex-end;gap:10px;margin-top:25px}#reviewContent{max-height:55vh;overflow:auto}#reviewContent .summaryrow{border-bottom:1px solid var(--line);padding-bottom:11px}#pendingField{margin:0 0 16px}.mappinghint{color:#b48e58!important}#saveStatus{color:var(--orange)}.errorfield{border-color:#c96242!important}.unmapped{font-size:9px;color:#ba9256}.previewbadge{background:#fff4df;color:#9e782d}.detailsnote{font-size:10px;color:#8d9a82;margin-top:12px}@media(min-width:1600px){main{padding-top:30px}.workspace{grid-template-columns:minmax(0,1fr) 320px}.cardbody{padding:24px}}@media(max-width:1100px){.workspace{grid-template-columns:minmax(0,1fr) 270px;gap:15px}.topbar{padding:0 22px}main{padding:20px 22px 0}.customergrid{grid-template-columns:1fr 1fr}.customergrid .searchfield{grid-column:1/-1}.sectionheading{padding:15px}.cardbody{padding:17px}.subtle{display:none}.three{gap:10px}.addressgrid{grid-template-columns:1fr}.address{min-height:0}.summary .cardbody{padding:15px}}@media(max-width:800px){.workspace{grid-template-columns:1fr}.summary{position:static}.helpbox{display:none}.summary .cardbody{max-width:none}.topbar{height:65px}main{padding:16px}.pageheading{margin:20px 0}h1{font-size:24px}.eyebrow{font-size:8px}.three{grid-template-columns:1fr 1fr}.topright{gap:10px}.summaryrow{font-size:12px}.addressgrid{grid-template-columns:1fr 1fr}}@media(max-width:480px){.three,.customergrid,.addressgrid{grid-template-columns:1fr}.topbar{padding:0 16px}.brand{font-size:12px}.status{font-size:9px;padding:4px 7px}.avatar{display:none}.pageheading{align-items:flex-start;gap:5px}.pageheading .button{font-size:10px;padding:7px}.pageheading p{font-size:11px}h1{font-size:21px}.pill{font-size:7px;margin-left:3px}.itemsearchrow{flex-wrap:wrap}.grow{flex-basis:100%}.tablefooter span:last-child{display:none}.more summary span{display:none}footer span:last-child{display:none}.dialogactions{flex-wrap:wrap}}
+.maincolumn,.card,aside{min-width:0}@media(max-width:800px){.workspace{grid-template-columns:minmax(0,1fr)}}
+
+html{max-width:100%;overflow-x:hidden}body{max-width:100%;overflow-x:hidden}.notice{overflow-wrap:anywhere}.topbar{gap:12px}.topright{flex-shrink:0}dialog{max-height:90vh;overflow-y:auto}
+
+/* Compact invoice workspace: retain readable controls while reducing scrolling. */
+.topbar{height:58px;padding:0 22px}.brand img{width:29px;height:29px}
+main{padding:14px 22px 0}.pageheading{margin:14px 0 16px}h1{font-size:25px}
+.pageheading .eyebrow{display:none}.workspace{gap:16px;grid-template-columns:minmax(0,1fr) 260px}
+.maincolumn{gap:14px}.sectionheading{min-height:46px;padding:10px 15px}
+.cardbody{padding:14px 15px}.grid{gap:11px;margin-bottom:12px}
+.field label{margin-bottom:4px}input,select,textarea{min-height:34px;padding:6px 9px;font-size:12px}
+.field small{margin-top:4px}.addressgrid{gap:12px;padding-top:12px}.addresscard{padding:10px 12px}
+.address{line-height:1.6;margin-top:7px;min-height:36px}.more{margin-top:12px;padding-top:10px}
+.more .grid{margin-top:12px}.summary .sectionheading{padding:12px 15px}.summary .cardbody{padding:14px}
+.summaryrow{margin-bottom:12px}.grandtotal{padding:12px;margin:14px 0}.grandtotal strong{font-size:26px}
+.notice{padding:10px 12px;margin-bottom:14px;font-size:11px}.results button{padding:7px 9px}.results{max-height:240px}
+@media(min-width:950px){.customergrid{grid-template-columns:2fr 1fr 1fr}.customergrid .searchfield{grid-column:auto}.addressgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){.workspace{grid-template-columns:minmax(0,1fr)}main{padding:12px}.topbar{padding:0 14px}}
+@media(max-width:480px){.addressgrid{grid-template-columns:1fr}h1{font-size:21px}}
+
+.packingerror{color:#b54d2b!important;white-space:normal;max-width:230px}
+.debugcopy{display:block;margin-top:6px;border:1px solid #e5c3b5;background:#fff7f3;color:#a94726;border-radius:5px;padding:4px 7px;font-size:9px;font-weight:600}
+.debugcopy:hover{background:#ffece4}
+
+/* Dense popup invoice entry */
+body{background:#eef2ef;font-size:11px;line-height:1.25}
+.compacttools{position:absolute;right:8px;top:6px;z-index:5;height:auto;border:0;background:transparent;padding:0;gap:4px}
+.compacttools .status,.compacttools .avatar{display:none}
+.compacttools .iconbutton{font-size:16px;width:24px;height:24px;padding:0;background:#fff;border:1px solid #dce2db;border-radius:5px}
+main{max-width:none;width:100%;height:100vh;overflow:hidden;padding:8px}
+.resetmini{position:absolute;right:40px;top:6px;z-index:6;min-height:24px;padding:3px 8px;font-size:10px;background:#fff}
+.breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
+.notice{position:absolute;left:8px;right:76px;top:6px;z-index:7;margin:0;padding:5px 8px;font-size:10px;border-radius:5px}
+.notice.success{display:none}
+form,.workspace{height:100%;min-height:0}
+.workspace{grid-template-columns:minmax(0,1fr) 330px;gap:8px;align-items:stretch}
+.maincolumn{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;min-height:0}
+.card{border-radius:5px;box-shadow:none}
+.sectionheading{min-height:28px;padding:5px 8px;background:#d7f0f4;border-bottom-color:#b6dfe6}
+.sectionheading h2{font-size:12px}.step{width:18px;height:18px;border-radius:4px;font-size:9px;background:#fff}.subtle{display:none}
+.cardbody{padding:7px 8px}.grid{gap:6px;margin-bottom:6px}.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.customergrid{grid-template-columns:1.7fr .75fr .9fr}.customergrid .searchfield{grid-column:auto}
+input,select,textarea{min-height:25px;border-radius:3px;padding:3px 6px;font-size:11px}
+.searchbox{height:25px;border-radius:3px;padding:0 6px}.searchbox>span{font-size:16px}.searchbox input{min-height:23px}
+kbd,.field small,.mappinghint,.unmapped,.tinybadge{display:none!important}
+.field label,.discountbox>label{font-size:10px;margin-bottom:2px;color:#1f3636}
+.addressgrid{grid-template-columns:1fr 1fr;border-top:0;padding-top:0;gap:6px}
+.addresscard{padding:5px 7px;border-radius:4px;background:#f9fbf8}
+h3{font-size:10px}.address{font-size:10px;line-height:1.25;min-height:28px;max-height:40px;overflow:hidden;margin:3px 0}
+.compact{margin-top:3px}.compact input{min-height:23px;padding:3px 5px;font-size:10px}
+.more{border-top:0;margin-top:0;padding-top:0}.more summary{display:none}.more .grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:0}
+.itemsCard{min-height:0;display:flex;flex-direction:column}.itemsCard .cardbody{padding:6px 8px}
+.itemsearchrow{gap:6px}.itemsearchrow .button{min-height:25px;padding:3px 8px;font-size:10px}
+.tablewrap{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;border-top:1px solid #dce2de;scrollbar-gutter:stable}
+table{table-layout:fixed;font-size:10px;width:100%;white-space:normal}
+th{position:sticky;top:0;z-index:1;padding:4px 5px;font-size:9px;background:#ffd0ad;color:#1f3636;border-color:#d8b08e}
+td{height:29px;padding:3px 5px;border-color:#d8ded9}
+th:first-child,td:first-child{padding-left:5px;width:26px}
+th:nth-child(2),td:nth-child(2){width:210px}
+th:nth-child(3),td:nth-child(3){width:70px}
+th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6),th:nth-child(7),td:nth-child(7){width:70px}
+th:nth-child(8),td:nth-child(8){width:92px}
+th:nth-child(9),td:nth-child(9){width:82px}
+th:nth-child(10),td:nth-child(10){width:28px}
+td input,td select{min-height:23px;min-width:0;width:100%;font-size:10px;padding:2px 4px;border-radius:3px}
+td.itemname strong{font-size:10px}td small{font-size:8px;margin-top:1px}.packingerror{font-size:9px;max-width:none}
+.empty{padding:22px 8px}.emptyicon,.empty p,.empty>span{display:none}.empty h3{font-size:11px}
+.pendingso{border-top:1px solid #dce2de;background:#f7fbff;max-height:118px;display:flex;flex-direction:column;min-height:86px}
+.pendingsohead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;background:#eef5ff;border-bottom:1px solid #dce8f8}
+.pendingsohead strong{font-size:11px;color:#26384d}.pendingsohead small{display:block;font-size:9px;color:#6d7f98;margin-top:1px}.pendingsohead span{font-size:10px;font-weight:650;color:#2e62a7;background:#e7f1ff;border:1px solid #c9dfff;border-radius:12px;padding:2px 8px;white-space:nowrap}
+.pendingso p{margin:3px 8px;font-size:9px;color:#728198}.pendingtable{overflow:auto;min-height:0;flex:1}.pendingtable table{font-size:9px}.pendingtable th{position:sticky;top:0;background:#f2f6fb;color:#4b5b70;padding:3px 6px;border-color:#e1e8f1}.pendingtable td{height:22px;padding:3px 6px;border-color:#e1e8f1}.pendingtable td:first-child,.pendingtable th:first-child{padding-left:8px;width:auto}.pendingtable th:nth-child(n),.pendingtable td:nth-child(n){width:auto}.pendingtable .mutedrow td{color:#718096}
+.tablefooter{padding:5px 8px;font-size:9px;border-radius:0}
+aside{min-height:0}.summary{height:100%;position:static;display:flex;flex-direction:column}
+.summary .sectionheading{padding:5px 8px}.summary .cardbody{padding:7px 8px;display:flex;flex-direction:column;min-height:0;gap:6px}
+.twoslim{grid-template-columns:1fr 1fr}.twoslim .field:first-child{grid-column:1/-1}
+.remarks textarea{height:43px;resize:none}.summarygrid{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px;border-top:1px solid #edf0e9;padding-top:6px}
+.summaryrow{font-size:10px;margin:0}.discountbox{border-top:0;margin:0;padding:0}.discountinput input,.discountinput select{min-height:24px;padding:2px 5px;font-size:10px}.discountinput select{width:58px}
+.grandtotal{margin:0;padding:8px;border-radius:5px}.grandtotal strong{font-size:22px;margin:0}.grandtotal small,.grandtotal>span{font-size:9px}
+#pendingField{margin:0}.full{min-height:30px;padding:5px 9px}.results{max-height:185px;font-size:10px;border-radius:4px}.results button{padding:6px}
+dialog{border-radius:7px}
+@media(max-width:950px){main{height:auto;overflow:auto}.workspace{grid-template-columns:1fr}.summary{height:auto}.tablewrap{overflow-x:auto}.more .grid,.three,.customergrid,.addressgrid,.twoslim,.summarygrid{grid-template-columns:1fr 1fr}}
+</style></head>
+<body>
+<header class="topbar compacttools"><span id="connectionStatus" class="status">Connecting to ERP</span><button type="button" class="iconbutton" id="settingsButton" aria-label="Connection settings">⚙</button><span class="avatar" id="avatar">R</span></header>
+<main><button type="button" id="resetButton" class="button quiet resetmini">↺ Start over</button>
+<div id="notice" class="notice" role="status" hidden></div>
+<form id="invoiceForm"><div class="workspace"><div class="maincolumn">
+<section class="card"><div class="sectionheading"><div><span class="step">01</span><h2>Customer & invoice</h2></div><span class="subtle">Start with who you’re billing</span></div><div class="cardbody"><div class="grid customergrid"><div class="field searchfield"><label for="customerSearch">Customer <em>*</em></label><div class="searchbox"><span>⌕</span><input id="customerSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="customerResults" placeholder="Search customers by name…" required><kbd>⌘ K</kbd></div><div id="customerResults" class="results" role="listbox" hidden></div><small id="customerHint">Search your ERP customer directory</small></div><div class="field"><label for="invoiceDate">Invoice date <em>*</em></label><input id="invoiceDate" type="date" required></div><div class="field"><label for="invoiceNumber">Invoice number</label><input id="invoiceNumber" readonly placeholder="Assigned by ERP" class="mutedinput"></div></div>
+<div class="grid three"><div class="field"><label for="salesOrder">Sales order</label><select id="salesOrder" disabled><option value="">Select a customer first</option></select></div><div class="field"><label for="salesperson">Salesperson <em>*</em></label><select id="salesperson"><option value="">Select salesperson</option></select></div><div class="field"><label for="paymentTerms">Payment terms (days)</label><input id="paymentTerms" type="number" min="0" step="1" placeholder="From customer"></div></div>
+<div class="grid three"><div class="field"><label for="location">Business location</label><select id="location"><option value="">Organization default</option></select></div><div class="field"><label for="placeOfSupply">Place of supply <em>*</em></label><input id="placeOfSupply" maxlength="2" placeholder="State code from ERP, e.g. KL" required></div><div class="field"><label for="gstNumber">Customer GSTIN</label><input id="gstNumber" readonly placeholder="From customer" class="mutedinput"></div></div>
+<div class="addressgrid"><div class="addresscard"><div class="addressheading"><h3>Billing address</h3><span class="tinybadge">ERP RECORD</span></div><p id="billingAddress" class="address">Select a customer to load their billing address.</p></div><div class="addresscard"><div class="addressheading"><h3>Shipping address</h3><label class="check"><input type="checkbox" id="sameAsBilling"> Same as billing</label></div><p id="shippingAddress" class="address">Shipping details will appear here.</p><div class="field compact"><label for="shippingGst">Shipping GSTIN</label><input id="shippingGst" placeholder="From customer"></div></div></div>
+<details class="more" open><summary>Contact & billing details <span>Required business fields</span></summary><div class="grid three" id="billingFields"></div></details></div></section>
+<section class="card itemsCard"><div class="sectionheading"><div><span class="step">02</span><h2>Invoice items</h2><span id="lineCount" class="count">0</span></div><span class="subtle">Prices & stock from ERP</span></div><div class="cardbody"><div class="itemsearchrow"><div class="searchfield grow"><label class="sr-only" for="itemSearch">Search items</label><div class="searchbox"><span>⌕</span><input id="itemSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="itemResults" placeholder="Search an item, SKU or scan a barcode…"><kbd>↵</kbd></div><div id="itemResults" class="results" role="listbox" hidden></div></div><button type="button" class="button" id="browseItems">＋ Browse items</button></div></div>
+<div class="tablewrap"><table><thead><tr><th>#</th><th class="itemname">Item details</th><th>Stock / UoM</th><th>Pieces / pack</th><th>Order qty</th><th>P. qty</th><th>Rate / piece</th><th>Tax</th><th class="right">Amount</th><th></th></tr></thead><tbody id="lineItems"></tbody></table><div id="emptyItems" class="empty"><div class="emptyicon">▧</div><h3>Your invoice starts here</h3><p>Find an item above to add it to this invoice.</p><span>Search by name or SKU · Barcode scanner ready</span></div></div><div class="pendingso" id="pendingSoPanel"><div class="pendingsohead"><div><strong>Pending Sales Orders</strong><small id="pendingSoItem">Select or scan an item</small></div><span id="pendingSoTotal">Total pending: 0 Nos</span></div><p id="pendingSoHelp">Pending SO quantities are shown for the current item.</p><div class="pendingtable"><table><thead><tr><th>SO number</th><th>Customer</th><th>Order date</th><th>Pending (Nos)</th><th>Pending (Boxes)</th></tr></thead><tbody id="pendingSoRows"><tr><td colspan="5">No item selected.</td></tr></tbody></table></div></div></div><div class="tablefooter"><span id="qtySummary">0 items · 0 total quantity</span><span>Amount = P. qty × rate · Tax exclusive</span></div></section>
+</div><aside><section class="card summary"><div class="sectionheading"><h2>Subtotals & delivery</h2><span class="currency" id="currencyLabel">INR</span></div><div class="cardbody"><div class="grid twoslim" id="dispatchFields"></div><div class="field remarks"><label for="notes">Remarks</label><textarea id="notes" rows="2" placeholder="Delivery instructions or invoice note"></textarea></div><div class="summarygrid"><div class="summaryrow"><span>Subtotal</span><strong id="subtotal">₹0.00</strong></div><div class="discountbox"><label for="discount">Discount</label><div class="discountinput"><input id="discount" type="number" min="0" value="0" step="0.01" aria-label="Discount value"><select id="discountType" aria-label="Discount type"><option value="percent">%</option><option value="amount">Amount</option></select></div></div><div class="summaryrow"><span>Discount amt</span><span class="green" id="discountAmount">− ₹0.00</span></div><div class="summaryrow"><span>Taxable</span><span id="taxable">₹0.00</span></div><div id="taxBreakdown"></div><div class="summaryrow"><span>Tax total</span><span id="taxTotal">₹0.00</span></div><div class="summaryrow"><label for="roundOff" class="check"><input id="roundOff" type="checkbox"> Round off</label><span id="roundValue">₹0.00</span></div></div><div class="grandtotal"><span>Invoice total</span><strong id="grandTotal">₹0.00</strong><small id="totalDetail">0 items in this invoice</small></div><div id="pendingField"></div><button class="button primary full" id="saveButton" type="submit">Review invoice <span>→</span></button></div></section></aside></div></form><footer><span id="footerStatus">Zoho ERP widget</span></footer></main>
+<dialog id="reviewDialog"><div class="dialogheading"><div><div class="eyebrow">READY FOR A QUICK CHECK</div><h2>Review your invoice</h2></div><button type="button" class="iconbutton" data-close="reviewDialog" aria-label="Close review">×</button></div><div id="reviewContent"></div><div class="dialogactions"><button type="button" class="button" data-close="reviewDialog">Back to editing</button><button type="button" class="button primary" id="confirmSave">Save draft to ERP →</button></div><p id="saveStatus" role="status"></p></dialog>
+<dialog id="settingsDialog"><div class="dialogheading"><h2>ERP connection</h2><button class="iconbutton" type="button" data-close="settingsDialog" aria-label="Close settings">×</button></div><p>Use an authorized Zoho connection. Never enter passwords or access tokens here.</p><div class="field"><label for="connectionName">Connection link name</label><input id="connectionName" placeholder="Your authorized connection link name"></div><div class="field"><label for="orgId">Organization ID</label><input id="orgId" placeholder="Detected from Zoho ERP"></div><p class="subtle">These settings apply to this session. For deployment, update app/config.json and the manifest’s usedConnections. Business-field mappings are configured in app/config.json.</p><button type="button" class="button primary" id="connectButton">Connect & load ERP data</button></dialog>
+<dialog id="resetDialog"><h2>Start a new invoice?</h2><p>This clears the current unsaved form.</p><div class="dialogactions"><button class="button" type="button" data-close="resetDialog">Keep editing</button><button class="button primary" type="button" id="confirmReset">Start over</button></div></dialog>
+<script nomodule>document.body.textContent='Please open this widget in a current browser.';</script><script>// Preview fixtures only. This file is never included in the ERP widget ZIP.
+(() => {
+const fields = {
+ billType:{label:'Bill type',id:'demo-bill',required:true},saleType:{label:'Type',id:'demo-type',required:true},billCreatedBy:{label:'Bill created by',id:'demo-user',required:true},transport:{label:'Transport',id:'demo-transport',required:true},agent:{label:'Agent name',id:'demo-agent'},vehicle:{label:'Vehicle number',id:'demo-vehicle'},whatsapp:{label:'WhatsApp number',id:'demo-whatsapp'},mobile:{label:'Mobile number',id:'demo-mobile',required:true},shippingPhone:{label:'Shipping phone',id:'demo-shipphone'},pending:{label:'Invoice pending',id:'demo-pending'}
+};
+const lookups = {
+ billType:[{id:'Credit',name:'Credit'},{id:'Cash',name:'Cash'}],saleType:[{id:'Wholesale',name:'Wholesale'},{id:'Retail',name:'Retail'}],transport:[{id:'Own delivery',name:'Own delivery'},{id:'Customer pickup',name:'Customer pickup'},{id:'Parcel service',name:'Parcel service'}],agent:[{id:'Direct',name:'Direct'},{id:'Arun Kumar',name:'Arun Kumar'}],vehicle:[{id:'KL 01 AB 2345',name:'KL 01 AB 2345'},{id:'KL 01 CD 6789',name:'KL 01 CD 6789'}]
+};
+window.RAJADHANI_PREVIEW_CONFIG = {
+ connectionLinkName:'preview-only',organizationId:'preview-org',customFields:fields,invoiceQuantityMode:'pieces',itemFields:{mu:'cf_m_unit',ratio:'cf_ratio'},lookupSources:Object.fromEntries(Object.keys(lookups).map(key=>[key,{path:`/preview/${key}`,key:'records',idKey:'id',labelKey:'name'}]))
+};
+const customers = [
+ {contact_id:'c1',contact_name:'Malabar Trading Company',company_name:'Malabar Trading Company',email:'accounts@example.com',mobile:'+91 98765 43210',gst_no:'32ABCDE1234F1Z5',place_of_contact:'KL',payment_terms:30,currency_code:'INR',billing_address:{address:'24, Market Road',city:'Kochi',state:'Kerala',zip:'682001',country:'India'},shipping_address:{address:'Warehouse 3, Industrial Estate',city:'Kochi',state:'Kerala',zip:'682030',country:'India',phone:'+91 98765 43210'}},
+ {contact_id:'c2',contact_name:'Sree Krishna Stores',company_name:'Sree Krishna Stores',email:'store@example.com',mobile:'+91 98470 12345',place_of_contact:'KL',payment_terms:15,currency_code:'INR',billing_address:{address:'18, Main Road',city:'Thrissur',state:'Kerala',zip:'680001',country:'India'},shipping_address:{address:'18, Main Road',city:'Thrissur',state:'Kerala',zip:'680001',country:'India'}},
+ {contact_id:'c3',contact_name:'Coastal Distributors',company_name:'Coastal Distributors',mobile:'+91 98950 67890',place_of_contact:'KL',payment_terms:0,currency_code:'INR',billing_address:{address:'7, Beach Road',city:'Kozhikode',state:'Kerala',zip:'673001',country:'India'},shipping_address:{address:'7, Beach Road',city:'Kozhikode',state:'Kerala',zip:'673001',country:'India'}}
+];
+const taxes=[{tax_id:'t5',tax_name:'GST 5',tax_percentage:5},{tax_id:'t12',tax_name:'GST 12',tax_percentage:12},{tax_id:'t18',tax_name:'GST 18',tax_percentage:18},{tax_id:'t0',tax_name:'Zero rated',tax_percentage:0}];
+const items=[
+ ['i1','Premium A4 Copier Paper','PAP-A4-75',285,480,'ream',10,'480256','t12'],
+ ['i2','Spiral Notebook · 200 pages','NB-SP-200',68,1250,'piece',12,'482010','t12'],
+ ['i3','Ballpoint Pen · Blue','PEN-BL-10',95,340,'box',10,'960810','t18'],
+ ['i4','Document File · A4','FILE-A4',32,670,'piece',20,'482030','t18'],
+ ['i5','Packing Tape · 48 mm','TAPE-48',42,900,'roll',6,'391910','t18'],
+ ['i6','Pencil Set · HB','PEN-HB-12',58,260,'box',12,'960910','t12']
+].map(([item_id,name,sku,rate,stock_on_hand,unit,pieces,hsn_or_sac,tax_id],index)=>{const tax=taxes.find(t=>t.tax_id===tax_id);return {item_id,item_master_id:`m${index+1}`,name,sku,rate,stock_on_hand,unit,hsn_or_sac,tax_id:'',tax_percentage:0,tax_name:'',item_tax_preferences:[{tax_specification:'intra',tax_specific_type:'tax',tax_id:tax.tax_id,tax_name:tax.tax_name,tax_percentage:tax.tax_percentage,tax_name_formatted:`${tax.tax_name} [${tax.tax_percentage}%]`},{tax_specification:'inter',tax_specific_type:'igst',tax_id:`i${tax.tax_id}`,tax_name:`IGST ${tax.tax_percentage}`,tax_percentage:tax.tax_percentage,tax_name_formatted:`IGST ${tax.tax_percentage} [${tax.tax_percentage}%]`}],pieces,status:'active'};});
+const itemMasters=items.map(i=>({item_master_id:i.item_master_id,item_master_name:i.name,custom_field_hash:{cf_m_unit:'SET',cf_ratio:i.pieces},custom_fields:[{api_name:'cf_m_unit',label:'M Unit',value:'SET'},{api_name:'cf_ratio',label:'Ratio',value:i.pieces}]}));
+const salesOrders=[
+ {salesorder_id:'so1',salesorder_number:'SO-00124',status:'confirmed',customer_id:'c1',customer_name:'Malabar Trading Company',date:'2026-09-18',salesperson_id:'s1',line_items:[{...items[0],line_item_id:'sol1',quantity:10,quantity_invoiced:0},{...items[1],line_item_id:'sol2',quantity:24,quantity_invoiced:0}]},
+ {salesorder_id:'so2',salesorder_number:'SO-00131',status:'confirmed',customer_id:'c2',customer_name:'Sree Krishna Stores',date:'2026-09-19',salesperson_id:'s2',line_items:[{...items[0],line_item_id:'sol3',quantity:6,quantity_invoiced:2},{...items[2],line_item_id:'sol4',quantity:5,quantity_invoiced:0}]},
+ {salesorder_id:'so3',salesorder_number:'SO-00133',status:'partially_invoiced',customer_id:'c3',customer_name:'Coastal Distributors',date:'2026-09-19',salesperson_id:'s1',line_items:[{...items[0],line_item_id:'sol5',quantity:15,quantity_invoiced:5}]}
+];
+window.ZFAPPS = {
+ extension:{init:async()=>({})},invoke:async()=>({}),get:async key=>key==='organization'?{organization:{organization_id:'preview-org',name:'Rajadhani · UI preview',currency_code:'INR'}}:{user:{name:'Anjali K'}},
+ request:async options=>{
+  await new Promise(resolve=>setTimeout(resolve,150));
+  const path=new URL(options.url).pathname.replace('/erp/v3',''),q=Object.fromEntries((options.url_query||[]).map(v=>[v.key,v.value]));let response={};
+  if(options.method==='POST')throw new Error('Preview cannot create ERP records.');
+  if(path==='/contacts')response={contacts:customers.filter(c=>(c.contact_name+' '+c.mobile).toLowerCase().includes((q.contact_name_contains||q.search_text||'').toLowerCase()))};
+  else if(path.startsWith('/contacts/'))response={contact:customers.find(c=>c.contact_id===path.split('/').pop())};
+  else if(path==='/items')response={items:items.filter(i=>(i.name+' '+i.sku).toLowerCase().includes((q.search_text||'').toLowerCase()))};
+  else if(path.startsWith('/items/'))response={item:items.find(i=>i.item_id===path.split('/').pop())};
+  else if(path.startsWith('/itemmasters/'))response={item_master:itemMasters.find(i=>i.item_master_id===path.split('/').pop())};
+  else if(path==='/settings/taxes')response={taxes};
+  else if(path==='/salespersons')response={salespersons:[{salesperson_id:'s1',salesperson_name:'Arun Kumar'},{salesperson_id:'s2',salesperson_name:'Meera Nair'}]};
+  else if(path==='/locations')response={locations:[{location_id:'loc1',location_name:'Main warehouse · Kochi'},{location_id:'loc2',location_name:'Thrissur branch'}]};
+  else if(path==='/salesorders')response={salesorders:salesOrders.filter(o=>!q.customer_id || String(o.customer_id)===String(q.customer_id)).map(({line_items,...o})=>o)};
+  else if(path.startsWith('/salesorders/'))response={salesorder:salesOrders.find(o=>o.salesorder_id===path.split('/').pop())};
+  else if(path.startsWith('/preview/'))response={records:lookups[path.split('/').pop()]||[]};
+  else throw new Error('No preview fixture for '+path);
+  return {data:{body:JSON.stringify({code:0,...response,page_context:{has_more_page:false}})}};
+ }
+};
+})();
+</script><script type="module">const pieceQuantity = line => line.quantity * (line.pieces === null ? 0 : (line.pieces ?? 1));
+function itemPacking(item, fields = {}) {
+  const normalize = value => String(value || '').trim().toLowerCase().replace(/[\s_.-]+/g, '');
+  const withoutPrefix = value => value.replace(/^(cf|customfield)/, '');
+  function labelMatches(value, wantedLabels) {
+    const normalized = normalize(value);
+    return wantedLabels.includes(normalized) || wantedLabels.includes(withoutPrefix(normalized));
+  }
+  function readHash(object, labels) {
+    const wantedLabels = labels.map(normalize);
+    for (const [key, value] of Object.entries(object || {})) {
+      if (labelMatches(key, wantedLabels)) return value;
+    }
+    return undefined;
+  }
+  function read(mapping, labels) {
+    const wantedLabels = labels.map(normalize);
+    const mapped = normalize(mapping);
+    const custom = item.custom_fields || [];
+    const matches = custom.filter(f => {
+      const apiName = normalize(f.api_name);
+      const fieldId = normalize(f.customfield_id);
+      const fieldLabel = normalize(f.label);
+      return mapped ? apiName === mapped || fieldId === mapped || fieldLabel === mapped : labelMatches(fieldLabel, wantedLabels) || labelMatches(apiName, wantedLabels);
+    });
+    // Parent and variant responses can repeat the same custom field.
+    // Prefer the last non-empty value (the variant), retaining the parent fallback.
+    const populated = matches.filter(f => f.value !== undefined && f.value !== null && f.value !== '');
+    if (populated.length) return populated[populated.length - 1].value;
+    if (mapping && item[mapping] != null) return item[mapping];
+    const hashLabels = mapping ? [mapping] : labels;
+    const hashValue = readHash(item.custom_field_hash, hashLabels) ?? readHash(item.customfield_hash, hashLabels);
+    if (hashValue != null) return hashValue;
+    const direct = Object.keys(item).find(key => labelMatches(key, wantedLabels));
+    if (direct) return item[direct];
+    return undefined;
+  }
+  const ratioValue = read(fields.ratio || fields.piecesPerPack, ['ratio', 'pieces per pack', 'piecesperpack', 'pack ratio']);
+  const ratio = Number(ratioValue);
+  let mu = String(read(fields.mu, ['mu', 'm unit', 'munit', 'm_unit', 'measurement unit']) ?? '').trim().toLowerCase();
+  if (!mu) {
+    const category = String(read(fields.category, ['item category', 'itemcategory', 'category']) ?? item.item_category ?? item.category_name ?? item.group_name ?? item.name ?? '').toLowerCase();
+    if (/\bsets?\b/.test(category)) mu = 'set';
+    else if (Number.isInteger(ratio) && ratio > 1) mu = 'set';
+    else if (['pcs','pc','piece','pieces'].includes(String(item.unit || '').trim().toLowerCase())) mu = 'pieces';
+  }
+  if (['piece','pieces','pcs','pc'].includes(mu)) return {mu:'Pieces',pieces:1};
+  if (['set','sets'].includes(mu)) {
+    if (Number.isInteger(ratio) && ratio > 0) return {mu:'Set',pieces:ratio};
+    return {mu:'Set',pieces:null,packingError:'Set items require a positive whole-number Ratio in the item master.'};
+  }
+  return {mu:mu || 'Unknown',pieces:null,packingError:'M Unit must be Set or Pieces. Map M Unit and Ratio to the item master fields.'};
+}
+const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
+function calculate(lines, discount = 0, type = 'percent', rounded = false) {
+  const subtotal = round(lines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
+  const discountAmount = round(type === 'percent' ? subtotal * discount / 100 : discount);
+  const taxable = round(subtotal - discountAmount);
+  const taxMap = new Map();
+  const tax = round(lines.reduce((s, l) => {
+    const base = round(pieceQuantity(l) * l.rate) * (subtotal ? taxable / subtotal : 0);
+    const amount = round(base * (l.tax?.percentage || 0) / 100);
+    if (l.tax) taxMap.set(l.tax.name, round((taxMap.get(l.tax.name) || 0) + amount));
+    return s + amount;
+  }, 0));
+  const beforeRounding = round(taxable + tax);
+  const adjustment = rounded ? round(Math.round(beforeRounding) - beforeRounding) : 0;
+  return { subtotal, discount: discountAmount, taxable, tax, adjustment, total: round(beforeRounding + adjustment), taxes: [...taxMap] };
+}
+function validateInvoice(state, values, config) {
+  const errors = [];
+  if (!state.customer) errors.push('Select a customer from the ERP search results.');
+  if (!values.date) errors.push('Choose an invoice date.');
+  if (!/^[A-Z]{2}$/.test(values.place_of_supply)) errors.push('Enter a valid two-letter place-of-supply state code.');
+  if (!state.lines.length) errors.push('Add at least one item.');
+  if (config.requireSalesperson && !values.salesperson_id) errors.push('Select a salesperson.');
+  if (config.requireLocation && !values.location_id) errors.push('Select a business location.');
+  if (!Number.isInteger(values.payment_terms) || values.payment_terms < 0) errors.push('Payment terms must be a whole number of days, zero or greater.');
+  if (!Number.isFinite(values.discount) || values.discount < 0 || (values.discountType === 'percent' && values.discount > 100)) errors.push('Enter a valid discount (0–100 for a percentage).');
+  const total = calculate(state.lines, values.discount, values.discountType, values.rounded);
+  if (total.taxable < 0) errors.push('Discount cannot exceed the subtotal.');
+  if (!['pieces','order'].includes(config.invoiceQuantityMode)) errors.push('Confirm how order quantity and P. quantity should be saved to ERP before saving.');
+  state.lines.forEach((line, index) => {
+    if (line.packingError) errors.push(`Item ${index + 1}: ${line.packingError}`);
+    if (!Number.isFinite(line.quantity) || line.quantity <= 0 || !Number.isFinite(line.rate) || line.rate < 0) errors.push(`Item ${index + 1}: enter a positive quantity and a non-negative rate.`);
+    if (!line.tax && !line.tax_exemption_id) errors.push(`Item ${index + 1}: choose an ERP tax or use an item with a configured exemption.`);
+    if (line.tracked) errors.push(`Item ${index + 1} needs serial, batch or storage allocation. Use the native ERP invoice editor for this item.`);
+  });
+  for (const [key, mapping] of Object.entries(config.customFields)) {
+    const value = values.custom[key];
+    if (mapping.id && mapping.required && (value === '' || value == null)) errors.push(`${mapping.label} is required.`);
+  }
+  return [...new Set(errors)];
+}
+function makePayload(state, values, config) {
+  const totals = calculate(state.lines, values.discount, values.discountType, values.rounded);
+  const payload = {
+    customer_id: String(state.customer.contact_id), date: values.date,
+    place_of_supply: values.place_of_supply, payment_terms: values.payment_terms,
+    line_items: state.lines.map((l, index) => ({
+      item_id: String(l.item_id), quantity: config.invoiceQuantityMode === 'pieces' ? pieceQuantity(l) : l.quantity, rate: config.invoiceQuantityMode === 'order' ? l.rate * (l.pieces ?? 1) : l.rate, item_order: index + 1,
+      ...(l.tax ? { tax_id: String(l.tax.id) } : { tax_exemption_id: l.tax_exemption_id }),
+      ...(l.salesorder_item_id ? { salesorder_item_id: String(l.salesorder_item_id) } : {})
+    })),
+    discount: values.discountType === 'percent' ? `${values.discount}%` : values.discount,
+    discount_type: 'entity_level', is_discount_before_tax: true, is_inclusive_tax: false,
+    adjustment: totals.adjustment, adjustment_description: 'Rounding', notes: values.notes,
+    custom_fields: Object.entries(config.customFields).filter(([k, m]) => m.id && values.custom[k] !== '' && values.custom[k] != null).map(([k, m]) => ({ customfield_id: String(m.id), value: values.custom[k] }))
+  };
+  if (values.salesperson_id) payload.salesperson_id = String(values.salesperson_id);
+  if (values.location_id) payload.location_id = String(values.location_id);
+  if (values.shipping_gst_no) payload.shipping_gst_no = values.shipping_gst_no;
+  if (values.sameAsBilling) payload.shipping_address = state.customer.billing_address || {};
+  else if (state.customer.shipping_address) payload.shipping_address = state.customer.shipping_address;
+  // Customer billing address and currency are deliberately inherited by ERP.
+  return payload;
+}
+function decodeResponse(response) {
+  let body = response?.data?.body ?? response?.body ?? response;
+  if (typeof body === 'string') body = JSON.parse(body);
+  if (!body || typeof body !== 'object') throw new Error('ERP returned an unreadable response.');
+  if (body.code != null && Number(body.code) !== 0) {
+    const err = new Error(body.message || `ERP error ${body.code}`); err.apiRejected = true; throw err;
+  }
+  return body;
+}
+
+class ERP {
+  constructor(config, sdk) { this.config = config; this.sdk = sdk; this.ready = false; }
+  async init() {
+    if (!this.sdk) throw new Error('Open this widget inside Zoho ERP to connect to your records.');
+    await this.sdk.extension.init();
+    const context = await this.sdk.get('organization');
+    this.organization = context.organization || context;
+    this.config.organizationId ||= String(this.organization.organization_id || '');
+    this.ready = true;
+    // Physical screen dimensions overestimate the usable browser viewport.
+    // Read the host viewport when same-origin; otherwise reserve generous chrome margins.
+    let viewportWidth = window.outerWidth || 1100;
+    let viewportHeight = window.outerHeight || 800;
+    try {
+      viewportWidth = window.top.innerWidth;
+      viewportHeight = window.top.innerHeight;
+    } catch { /* Cross-origin host: use conservative browser-window bounds. */ }
+    const width = Math.max(760, Math.min(1280, viewportWidth - 260));
+    const height = Math.max(520, Math.min(820, viewportHeight - 90));
+    try {
+      await this.sdk.invoke('RESIZE', { width: `${width}px`, height: `${height}px` });
+    } catch { /* Host may constrain popup dimensions. */ }
+    return this.organization;
+  }
+  async request(path, query = {}, method = 'GET', payload) {
+    if (!this.ready) throw new Error('ERP is not connected. Open the widget inside Zoho ERP.');
+    if (!this.config.connectionLinkName || !this.config.organizationId) throw new Error('Complete the ERP connection settings to load records.');
+    if (!path.startsWith('/') || path.startsWith('//')) throw new Error('Lookup paths must be relative ERP API paths.');
+    const options = {
+      url: `${this.config.apiBase.replace(/\/$/, '')}${path}`, method,
+      url_query: Object.entries({ organization_id: this.config.organizationId, ...query }).filter(([,v]) => v !== '' && v != null).map(([key, value]) => ({ key, value: String(value) })),
+      connection_link_name: this.config.connectionLinkName
+    };
+    if (payload) {
+      options.header = [{ key: 'Content-Type', value: 'application/json' }];
+      options.body = { mode: 'raw', raw: JSON.stringify(payload) };
+    }
+    try {
+      return decodeResponse(await this.sdk.request(options));
+    } catch (err) {
+      if (/not authorized|permission|oauth|scope/i.test(err.message || '')) {
+        const scope = path.startsWith('/contacts') ? 'ERP.contacts.READ' : path.startsWith('/salesorders') ? 'ERP.salesorders.READ' : path.startsWith('/invoices') ? 'ERP.invoices.CREATE' : 'ERP.settings.READ';
+        err.message = `Access denied for ${path}. Check ${scope} in erp_admin, reauthorize the connection for the current user, and verify access to organization ${this.config.organizationId}.`;
+      }
+      throw err;
+    }
+  }
+  async all(path, key, query = {}) {
+    const records = [];
+    for (let page = 1; page <= 100; page++) {
+      const result = await this.request(path, { ...query, page, per_page: 200 });
+      if (!Array.isArray(result[key])) throw new Error(`ERP did not return ${key} for ${path}. Check the configured lookup.`);
+      records.push(...result[key]);
+      const context = Array.isArray(result.page_context) ? result.page_context[0] : result.page_context;
+      if (!context?.has_more_page) return records;
+    }
+    throw new Error(`Too many records in ${path}; configure a narrower lookup.`);
+  }
+  async salespersons() {
+    const normalize = records => records
+      .filter(r => r.status !== 'inactive' && r.is_active !== false)
+      .map(r => ({
+        salesperson_id: String(r.salesperson_id || r.user_id || r.id || ''),
+        salesperson_name: r.salesperson_name || r.name || r.full_name || r.email || r.user_name || String(r.salesperson_id || r.user_id || r.id || '')
+      }))
+      .filter(r => r.salesperson_id && r.salesperson_name);
+    try {
+      const result = await this.request('/salespersons', { page: 1, per_page: 200 });
+      const records = result.salespersons || result.users || result.data;
+      if (Array.isArray(records)) return normalize(records);
+    } catch {
+      // Not every ERP tenant exposes a salespersons endpoint.
+    }
+    return normalize(await this.all('/users', 'users'));
+  }
+  async searchCustomers(text, page = 1) {
+    const query = text.trim();
+    const result = await this.request('/contacts', { contact_type: 'customer', contact_name_contains: query, page, per_page: 25 });
+    // Some ERP tenants ignore search_text; use the documented name filter and
+    // never display unrelated records if the server ignores that filter too.
+    if (query && Array.isArray(result.contacts)) {
+      const needle = query.normalize('NFKC').toLocaleLowerCase();
+      result.contacts = result.contacts.filter(c => String(c.contact_name || '').normalize('NFKC').toLocaleLowerCase().includes(needle));
+    }
+    return result;
+  }
+  searchItems(text, page = 1) { return this.request('/items', { search_text: text, page, per_page: 25 }); }
+  async customer(id) { return (await this.request(`/contacts/${encodeURIComponent(id)}`)).contact; }
+  async item(id) { return (await this.request(`/items/${encodeURIComponent(id)}`)).item; }
+  async itemMaster(id) { return (await this.request(`/itemmasters/${encodeURIComponent(id)}`)).item_master; }
+  async salesOrder(id) { return (await this.request(`/salesorders/${encodeURIComponent(id)}`)).salesorder; }
+  createInvoice(payload) { return this.request('/invoices', { send: false }, 'POST', payload); }
+  async refreshInvoices() {
+    for (const args of [['REFRESH_DATA', 'invoice'], ['REFRESH_DATA', { entity: 'invoice' }], ['REFRESH_DATA']]) {
+      try { await this.sdk.invoke(...args); return true; } catch { /* Try the next host-supported shape. */ }
+    }
+    try { window.top.location.reload(); return true; } catch { return false; }
+  }
+}
+
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const config = {"apiBase":"https://www.zohoapis.in/erp/v3","connectionLinkName":"erp_admin","organizationId":"","customFields":{"billType":{"label":"Bill type","id":"","required":false},"saleType":{"label":"Type","id":"","required":false},"billCreatedBy":{"label":"Bill created by","id":"","required":false},"transport":{"label":"Transport","id":"","required":false},"agent":{"label":"Agent name","id":"","required":false},"vehicle":{"label":"Vehicle number","id":"","required":false},"whatsapp":{"label":"WhatsApp number","id":"","required":false},"mobile":{"label":"Mobile number","id":"","required":false},"shippingPhone":{"label":"Shipping phone","id":"","required":false},"pending":{"label":"Invoice pending","id":"","required":false}},"itemFields":{"mu":"","ratio":""},"lookupSources":{},"requireSalesperson":true,"requireLocation":false,"invoiceQuantityMode":"pieces"};
+if (window.RAJADHANI_PREVIEW_CONFIG) Object.assign(config, window.RAJADHANI_PREVIEW_CONFIG);
+const api = new ERP(config, window.ZFAPPS);
+const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: false, saved: false, uncertain: false, customerVersion: 0, pendingOperations: 0, pendingSO: { item: null, rows: [], loading: false, error: '' } };
+let approvedPayload = null;
+function pending(delta) { state.pendingOperations += delta; $('saveButton').disabled = state.pendingOperations > 0 || state.saved || state.uncertain; }
+const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: state.currency }).format(Number.isFinite(n) ? n : 0);
+function notice(message, kind = '') { $('notice').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
+function error(err) { notice(err.message || String(err), 'error'); }
+function fieldMarkup(key) {
+  const f = config.customFields[key];
+  const type = /phone|mobile|whatsapp/i.test(key) ? 'tel' : 'text';
+  const input = config.lookupSources[key] ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option></select>` : `<input id="cf_${key}" type="${type}" ${f.required ? 'required' : ''} placeholder="${key === 'billCreatedBy' ? 'Current ERP user' : esc(f.label)}">`;
+  if (key === 'pending') return `<label class="check"><input id="cf_pending" type="checkbox"> Invoice pending</label>${!f.id ? '<small class="unmapped">Not sent until mapped</small>' : ''}`;
+  return `<div class="field"><label for="cf_${key}">${esc(f.label)} ${f.required && f.id ? '<em>*</em>' : ''}</label>${input}${!f.id ? '<small class="mappinghint">Not sent to ERP yet</small>' : ''}</div>`;
+}
+$('billingFields').innerHTML = ['billType','saleType','billCreatedBy','mobile','whatsapp','shippingPhone'].map(fieldMarkup).join('');
+$('dispatchFields').innerHTML = ['transport','agent','vehicle'].map(fieldMarkup).join('');
+$('pendingField').innerHTML = fieldMarkup('pending');
+$('invoiceDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
+function getValues() {
+  return { date: $('invoiceDate').value, place_of_supply: $('placeOfSupply').value.trim().toUpperCase(), payment_terms: $('paymentTerms').value === '' ? 0 : Number($('paymentTerms').value), salesperson_id: $('salesperson').value, location_id: $('location').value,
+    shipping_gst_no: $('shippingGst').value.trim(), notes: $('notes').value.trim(), sameAsBilling: $('sameAsBilling').checked,
+    discount: Number($('discount').value), discountType: $('discountType').value, rounded: $('roundOff').checked,
+    custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, k === 'pending' ? $('cf_pending').checked : $(`cf_${k}`).value.trim()])) };
+}
+function totals() {
+  const v = getValues(); const t = calculate(state.lines, v.discount, v.discountType, v.rounded);
+  for (const [id, key] of Object.entries({subtotal:'subtotal',discountAmount:'discount',taxable:'taxable',taxTotal:'tax',roundValue:'adjustment',grandTotal:'total'})) $(id).textContent = `${id === 'discountAmount' ? '− ' : ''}${money(t[key])}`;
+  $('taxBreakdown').innerHTML = t.taxes.map(([name, amount]) => `<div class="summaryrow"><span>${esc(name)}</span><span>${esc(money(amount))}</span></div>`).join('');
+  $('totalDetail').textContent = `${state.lines.length} item${state.lines.length === 1 ? '' : 's'} in this invoice`;
+  $('lineCount').textContent = state.lines.length;
+  $('qtySummary').textContent = `${state.lines.length} items · ${Math.round(state.lines.reduce((s,l)=>s+l.quantity,0)*1000)/1000} order qty · ${Math.round(state.lines.reduce((s,l)=>s+(l.pieces ? pieceQuantity(l) : 0),0)*1000)/1000} pieces`;
+}
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    notice('Item ERP response copied. Paste it here and I will map M Unit and Ratio exactly.', 'success');
+  } catch {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    document.body.append(area);
+    area.select();
+    const copied = document.execCommand('copy');
+    area.remove();
+    notice(copied ? 'Item ERP response copied. Paste it here and I will map M Unit and Ratio exactly.' : 'Could not copy automatically. Open the browser console and copy the Rajadhani item debug output.', copied ? 'success' : 'error');
+  }
+}
+const qty = n => Math.round(Number(n || 0) * 1000) / 1000;
+function renderPendingSO() {
+  const panel = state.pendingSO;
+  $('pendingSoItem').textContent = panel.item?.name ? panel.item.name : 'Select or scan an item';
+  $('pendingSoTotal').textContent = `Total pending: ${qty(panel.rows.reduce((s,r)=>s+r.pendingNos,0))} Nos`;
+  if (panel.loading) {
+    $('pendingSoHelp').textContent = 'Loading pending SO quantities for this item…';
+    $('pendingSoRows').innerHTML = '<tr class="mutedrow"><td colspan="5">Checking ERP sales orders…</td></tr>';
+    return;
+  }
+  if (panel.error) {
+    $('pendingSoHelp').textContent = 'Sales-order lookup did not complete. You can still continue the invoice.';
+    $('pendingSoRows').innerHTML = `<tr class="mutedrow"><td colspan="5">${esc(panel.error)}</td></tr>`;
+    return;
+  }
+  $('pendingSoHelp').textContent = panel.item ? 'These pending SO quantities are reserved against stock for the selected item.' : 'Pending SO quantities are shown for the current item.';
+  if (!panel.item) {
+    $('pendingSoRows').innerHTML = '<tr class="mutedrow"><td colspan="5">No item selected.</td></tr>';
+    return;
+  }
+  if (!panel.rows.length) {
+    $('pendingSoRows').innerHTML = '<tr class="mutedrow"><td colspan="5">No pending sales orders for this item.</td></tr>';
+    return;
+  }
+  $('pendingSoRows').innerHTML = panel.rows.map(r => `<tr><td>${esc(r.number)}</td><td>${esc(r.customer)}</td><td>${esc(r.date || '—')}</td><td>${esc(qty(r.pendingNos))}</td><td>${esc(qty(r.pendingBoxes))}</td></tr>`).join('');
+}
+function pendingSalesOrderLine(order, invoiceLine) {
+  const match = (order.line_items || []).find(l => String(l.item_id) === String(invoiceLine.item_id));
+  if (!match) return null;
+  const ordered = Number(match.quantity || 0);
+  const invoiced = Number(match.quantity_invoiced || match.quantity_invoiced_cancelled || 0);
+  const cancelled = Number(match.quantity_cancelled || match.cancelled_quantity || 0);
+  const pendingBoxes = Math.max(0, ordered - invoiced - cancelled);
+  if (!pendingBoxes) return null;
+  return {
+    number: order.salesorder_number || order.reference_number || order.salesorder_id || 'Sales order',
+    customer: order.customer_name || order.customer?.contact_name || order.customer_id || 'Customer',
+    date: order.date || order.order_date || order.created_time?.slice?.(0,10) || '',
+    pendingBoxes,
+    pendingNos: pendingBoxes * Number(invoiceLine.pieces || 1)
+  };
+}
+async function loadPendingSO(line) {
+  if (!line?.item_id) {
+    state.pendingSO = { item: null, rows: [], loading: false, error: '' };
+    renderPendingSO();
+    return;
+  }
+  const item = { item_id: line.item_id, name: line.name, pieces: line.pieces };
+  state.pendingSO = { item, rows: [], loading: true, error: '' };
+  renderPendingSO();
+  try {
+    const query = $('location').value ? { location_id: $('location').value } : {};
+    const orders = (await api.all('/salesorders','salesorders',query)).filter(o => !o.status || ['open','confirmed','partially_invoiced'].includes(String(o.status).toLowerCase()));
+    const rows = [];
+    for (const summary of orders.slice(0, 75)) {
+      try {
+        const order = await api.salesOrder(summary.salesorder_id);
+        const row = pendingSalesOrderLine({...summary, ...order}, line);
+        if (row) rows.push(row);
+      } catch { /* Skip an SO detail that this user cannot read. */ }
+    }
+    if (String(state.pendingSO.item?.item_id) !== String(item.item_id)) return;
+    state.pendingSO = { item, rows, loading: false, error: '' };
+  } catch (err) {
+    if (String(state.pendingSO.item?.item_id) !== String(item.item_id)) return;
+    state.pendingSO = { item, rows: [], loading: false, error: err.message || String(err) };
+  }
+  renderPendingSO();
+}
+function renderLines(focusIndex = null) {
+  $('emptyItems').hidden = !!state.lines.length;
+  $('lineItems').innerHTML = state.lines.map((l,i) => `<tr data-line="${i}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${esc(money(pieceQuantity(l)*l.rate))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
+  totals();
+  if (!state.lines.length) loadPendingSO(null);
+  if (focusIndex != null) requestAnimationFrame(() => $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'}));
+}
+$('lineItems').addEventListener('input', e => {
+  const {row,field} = e.target.dataset; if (row == null || !field) return;
+  const l=state.lines[Number(row)]; l[field] = field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
+  document.querySelector(`[data-amount="${row}"]`).textContent = money(pieceQuantity(l)*l.rate);
+  document.querySelector(`[data-piece="${row}"]`).textContent = l.pieces ? Math.round(l.pieces*l.quantity*1000)/1000 : '—'; totals();
+});
+$('lineItems').addEventListener('click', e => {
+  const debug=e.target.closest('[data-debug]');
+  if (debug) {
+    const line=state.lines[Number(debug.dataset.debug)];
+    if (line?.itemDebug) copyText(JSON.stringify(line.itemDebug, null, 2));
+    return;
+  }
+  const b=e.target.closest('[data-remove]'); if (b) { state.lines.splice(Number(b.dataset.remove),1);renderLines(); return; }
+  const row=e.target.closest('tr[data-line]');
+  if (row && !e.target.closest('input,select,button')) loadPendingSO(state.lines[Number(row.dataset.line)]);
+});
+['discount','discountType','roundOff'].forEach(id=>$(id).addEventListener('input',totals));
+function address(a) { return a ? [a.attention,a.address,a.street2,[a.city,a.state,a.zip].filter(Boolean).join(', '),a.country].filter(Boolean).join('\n') || 'No address recorded in ERP.' : 'No address recorded in ERP.'; }
+function addresses() { $('billingAddress').textContent=address(state.customer?.billing_address);$('shippingAddress').textContent=address($('sameAsBilling').checked ? state.customer?.billing_address : state.customer?.shipping_address); }
+$('sameAsBilling').addEventListener('change', addresses);
+function selectOptions(id, records, idKey, nameKey, placeholder) { const current=$(id).value;$(id).replaceChildren(new Option(placeholder,''),...records.filter(r=>r.status!=='inactive'&&r.is_active!==false).map(r=>new Option(r[nameKey] || r.name || String(r[idKey]),String(r[idKey]))));if(records.some(r=>String(r[idKey])===current))$(id).value=current; }
+async function chooseCustomer(record) {
+  const version=++state.customerVersion;
+  state.customer=null; state.lines=[]; renderLines(); $('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Loading sales orders…',''));
+  $('customerSearch').value=record.contact_name; $('customerHint').textContent='Loading customer details…';
+  pending(1);
+  try {
+    const c=await api.customer(record.contact_id); if(version!==state.customerVersion)return;
+    if(!c)throw new Error('ERP did not return the selected customer.');
+    if(c.status==='inactive')throw new Error('This customer is inactive. Choose an active customer.');
+    if(c.currency_code && api.organization?.currency_code && c.currency_code!==api.organization.currency_code)throw new Error('This customer uses another currency. Use the native ERP editor to apply exchange rates and price lists.');
+    state.customer=c;state.currency=c.currency_code || api.organization?.currency_code || 'INR';$('currencyLabel').textContent=state.currency;
+    $('customerSearch').value=c.contact_name; $('customerHint').textContent=[c.company_name,c.email].filter(Boolean).join(' · ') || 'Customer loaded from ERP';
+    $('gstNumber').value=c.gst_no || ''; $('shippingGst').value=c.shipping_gst_no || '';
+    $('placeOfSupply').value=c.place_of_contact || c.place_of_supply || ''; $('paymentTerms').value=c.payment_terms ?? 0;
+    $('cf_mobile').value=c.mobile || c.contact_persons?.find(p=>p.is_primary_contact)?.mobile || c.phone || '';
+    $('cf_shippingPhone').value=c.shipping_address?.phone || '';
+    for(const [k,m] of Object.entries(config.customFields)) { const source=(c.custom_fields||[]).find(f=>m.customerApiName && f.api_name===m.customerApiName); if(source && k!=='pending')$(`cf_${k}`).value=source.value ?? ''; }
+    addresses();totals();
+    const orders=await api.all('/salesorders','salesorders',{customer_id:c.contact_id}); if(version!==state.customerVersion)return;
+    selectOptions('salesOrder',orders.filter(o=>['open','confirmed','partially_invoiced'].includes(o.status)),'salesorder_id','salesorder_number','No sales order');$('salesOrder').disabled=false;
+  }catch(e){if(version===state.customerVersion){error(e);$('customerHint').textContent=state.customer?'Customer loaded; sales order lookup failed.':'Could not load customer. Search again.';$('salesOrder').replaceChildren(new Option('Sales orders unavailable',''));}}finally{pending(-1);}
+}
+function searchable(inputId, resultsId, search, key, describe, choose) {
+  const input=$(inputId), box=$(resultsId); let timer, sequence=0, page=1, query='';
+  const close=()=>{box.hidden=true;input.setAttribute('aria-expanded','false');};
+  async function run(append=false) {
+    const token=++sequence; if(!append){page=1;query=input.value.trim();box.innerHTML='<p>Searching ERP…</p>';}
+    box.hidden=false;input.setAttribute('aria-expanded','true');
+    try { const r=await search(query,page);if(token!==sequence)return;const records=(r[key]||[]).filter(x=>x.status!=='inactive' && x.is_active!==false);
+      if(!append)box.replaceChildren();else box.querySelector('[data-more]')?.remove();
+      if(!records.length&&!append)box.innerHTML='<p>No matching records. Try a different search.</p>';
+      records.forEach(record=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','option');const [name,detail]=describe(record);b.innerHTML=`${esc(name)}<span>${esc(detail)}</span>`;b.onclick=async()=>{close();try{await choose(record);}catch(e){error(e);}};box.append(b);});
+      const ctx=Array.isArray(r.page_context)?r.page_context[0]:r.page_context;if(ctx?.has_more_page){const b=document.createElement('button');b.type='button';b.dataset.more='true';b.textContent='Load more results →';b.onclick=()=>{page++;run(true);};box.append(b);}
+    }catch(e){if(token===sequence)box.innerHTML=`<p>${esc(e.message)}</p>`;}
+  }
+  input.addEventListener('input',()=>{sequence++;clearTimeout(timer);box.replaceChildren();close();timer=setTimeout(()=>run(),280);});
+  input.addEventListener('keydown',e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'){e.preventDefault();const options=box.querySelectorAll('button[role=option]');if(options.length===1&&!box.hidden)options[0].click();else run();}});
+  box.addEventListener('keydown',e=>{const buttons=[...box.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(index+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}if(e.key==='Escape'){close();input.focus();}});
+  document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==input)close();});
+  return run;
+}
+searchable('customerSearch','customerResults',(q,p)=>api.searchCustomers(q,p),'contacts',c=>[c.contact_name,[c.company_name,c.mobile || c.email].filter(Boolean).join(' · ')],chooseCustomer);
+$('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;state.lines=[];renderLines();$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';$('paymentTerms').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
+function normalizeTax(t){return {id:String(t.tax_id || t.tax_group_id || t.id || ''),name:t.tax_name || t.tax_group_name || t.name || t.tax_name_formatted || t.text,percentage:Number(t.tax_percentage ?? t.tax_group_percentage ?? t.percentage ?? 0)};}
+function itemTax(item) {
+  const preferences = item.item_tax_preferences || [];
+  const preferred = preferences.find(t => String(t.tax_specification || '').toLowerCase() === 'intra')
+    || preferences.find(t => String(t.tax_specific_type || '').toLowerCase() === 'tax')
+    || preferences[0]
+    || item;
+  const id = preferred.tax_id || preferred.tax_group_id || item.tax_id;
+  if (!id) return null;
+  const existing = state.taxes.find(t => String(t.id) === String(id));
+  if (existing) return existing;
+  const tax = normalizeTax({...preferred, tax_id: id});
+  if (tax.id && tax.name && Number.isFinite(tax.percentage)) {
+    state.taxes.push(tax);
+    return tax;
+  }
+  return null;
+}
+function debugSnapshot(selectedRecord, itemResponse, masterId, masterResponse, mergedItem, masterError) {
+  const clean = value => JSON.parse(JSON.stringify(value, (key, data) => key === '__rajadhaniDebug' ? undefined : data));
+  return {
+    selectedRecord: clean(selectedRecord),
+    itemResponse: clean(itemResponse),
+    masterId: masterId ?? null,
+    masterResponse: masterResponse ? clean(masterResponse) : null,
+    mergedItem: clean(mergedItem),
+    ...(masterError ? {masterError} : {})
+  };
+}
+async function fullItem(record) {
+  const item = await api.item(record.item_id);
+  if (!item) throw new Error('ERP did not return item details.');
+  const masterId = item.item_master_id || record.item_master_id || item.group_id || record.group_id;
+  if (!masterId) {
+    item.__rajadhaniDebug = debugSnapshot(record, item, null, null, item);
+    console.info('Rajadhani item debug', item.__rajadhaniDebug);
+    return item;
+  }
+  try {
+    const master = await api.itemMaster(masterId);
+    if (!master) {
+      item.__rajadhaniDebug = debugSnapshot(record, item, masterId, null, item);
+      console.info('Rajadhani item debug', item.__rajadhaniDebug);
+      return item;
+    }
+    const merged = {
+      ...master,
+      ...item,
+      custom_fields: [...(master.custom_fields || []), ...(item.custom_fields || [])],
+      custom_field_hash: {...(master.custom_field_hash || master.customfield_hash || {}), ...(item.custom_field_hash || item.customfield_hash || {})}
+    };
+    merged.__rajadhaniDebug = debugSnapshot(record, item, masterId, master, merged);
+    console.info('Rajadhani item debug', merged.__rajadhaniDebug);
+    return merged;
+  } catch (err) {
+    notice(`Item master custom fields could not be loaded for ${item.name || record.name}. Check ERP.items.READ/settings access or map the item custom-field IDs in app/config.json. ${err.message}`, 'error');
+    item.__rajadhaniDebug = debugSnapshot(record, item, masterId, null, item, err.message);
+    console.info('Rajadhani item debug', item.__rajadhaniDebug);
+    return item;
+  }
+}
+async function lineFromItem(item, extra={}) {
+  const tax = itemTax(item);
+  const packing = itemPacking(item, config.itemFields);
+  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,tax,tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
+}
+async function addItem(record) {
+  if(!state.customer)throw new Error('Select a customer before adding items.');
+  const version=state.customerVersion;pending(1);
+  try{const item=await fullItem(record);if(version!==state.customerVersion)return;
+    const line=await lineFromItem(item);if(line.tracked)throw new Error('This item requires batch, serial or storage allocation. Please use the native ERP invoice editor.');
+    const existingIndex=state.lines.findIndex(l=>l.item_id===line.item_id&&!l.salesorder_item_id);if(existingIndex>=0)state.lines[existingIndex].quantity++;else state.lines.push(line);
+    const targetIndex=existingIndex>=0?existingIndex:state.lines.length-1;
+    $('itemSearch').value='';renderLines(targetIndex);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();
+  }finally{pending(-1);}
+}
+const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem);
+$('browseItems').onclick=()=>{$('itemSearch').focus();browse();};
+$('salesOrder').addEventListener('change',async()=>{
+  if(!$('salesOrder').value)return;
+  if(!window.RAJADHANI_PREVIEW_CONFIG){notice('Sales-order import needs confirmation of whether ERP order quantities represent sets or pieces. Add items directly for now.');$('salesOrder').value='';return;}
+  if(state.lines.length){notice('Remove the current invoice items before importing a sales order.');$('salesOrder').value='';return;}
+  const version=state.customerVersion;pending(1);$('salesOrder').disabled=true;
+  try{const order=await api.salesOrder($('salesOrder').value);if(version!==state.customerVersion)return;if(String(order.customer_id)!==String(state.customer?.contact_id))throw new Error('Sales order belongs to a different customer.');
+    const lines=[];for(const l of order.line_items||[]){const remaining=Number(l.quantity)-Number(l.quantity_invoiced||0);if(remaining<=0)continue;const item=await fullItem(l);lines.push(await lineFromItem({...item,...l,custom_fields:item.custom_fields,custom_field_hash:item.custom_field_hash},{quantity:remaining,salesorder_item_id:l.line_item_id}));}
+    if(version!==state.customerVersion)return;state.lines=lines;if(order.salesperson_id)$('salesperson').value=String(order.salesperson_id);renderLines();if(state.lines[0])loadPendingSO(state.lines[0]);notice('Unbilled sales order items imported. Review quantities, rates and taxes.');
+  }catch(e){error(e);}finally{pending(-1);if(version===state.customerVersion)$('salesOrder').disabled=false;}
+});
+async function loadLookups() {
+  const jobs=[
+    {name:'customers',run:()=>api.searchCustomers('',1)},
+    {name:'items',run:()=>api.searchItems('',1)},
+    {name:'taxes',run:async()=>{state.taxes=(await api.all('/settings/taxes','taxes')).filter(t=>t.is_active!==false).map(normalizeTax);renderLines();}},
+    {name:'salespersons',run:async()=>{const source=config.lookupSources.salesperson;if(source)selectOptions('salesperson',await api.all(source.path,source.key,source.query),source.idKey,source.labelKey,'Select salesperson');else selectOptions('salesperson',await api.salespersons(),'salesperson_id','salesperson_name','Select salesperson');}},
+    {name:'locations',run:async()=>{selectOptions('location',await api.all('/locations','locations'),'location_id','location_name','Organization default');}},
+    ...Object.entries(config.lookupSources).filter(([key])=>key!=='salesperson').map(([key,source])=>({name:config.customFields[key]?.label||key,run:async()=>{if(!$(`cf_${key}`))return;selectOptions(`cf_${key}`,await api.all(source.path,source.key,source.query),source.idKey,source.labelKey,`Select ${config.customFields[key].label.toLowerCase()}`);}}))
+  ];
+  const results=await Promise.allSettled(jobs.map(j=>j.run()));const failures=results.flatMap((r,i)=>r.status==='rejected'?[`${jobs[i].name}: ${r.reason.message}`]:[]);
+  if(failures.length)notice(`Some ERP lists could not load. ${failures.join(' • ')}`,'error');
+  else notice('');
+  return failures;
+}
+async function connect() {
+  try{if(!api.ready)await Promise.race([api.init(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('ERP did not respond. Open the installed widget in your organization and retry.')),12000))]);
+    $('orgId').value=config.organizationId;$('connectionName').value=config.connectionLinkName;
+    if(!config.connectionLinkName)throw new Error('Connection setup required. Add your ERP connection in settings and map the business fields in app/config.json.');
+    const failures=await loadLookups();$('connectionStatus').textContent=window.RAJADHANI_PREVIEW_CONFIG?'Preview · sample data':failures.length?'ERP access incomplete':'ERP connected';$('connectionStatus').className=`status ${window.RAJADHANI_PREVIEW_CONFIG||failures.length?'offline':''}`;
+    $('footerStatus').textContent=api.organization?.name || 'Zoho ERP';
+    try{const user=await api.sdk.get('user');const u=user.user||user;$('cf_billCreatedBy').value=u.name||'';$('avatar').textContent=(u.name||'R').slice(0,1);}catch{/* User name can be entered manually. */}
+  }catch(e){$('connectionStatus').textContent='Setup required';$('connectionStatus').className='status offline';notice(e.message);}
+}
+$('settingsButton').onclick=()=>{$('connectionName').value=config.connectionLinkName;$('orgId').value=config.organizationId;$('settingsDialog').showModal();};
+$('connectButton').onclick=async()=>{if(state.lines.length||state.customer){notice('Start over before changing the ERP connection.');$('settingsDialog').close();return;}config.connectionLinkName=$('connectionName').value.trim();config.organizationId=$('orgId').value.trim();$('settingsDialog').close();await connect();};
+for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.dataset.close).close();
+$('resetButton').onclick=()=>$('resetDialog').showModal();$('confirmReset').onclick=()=>location.reload();
+$('invoiceForm').addEventListener('submit',e=>{
+  e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
+  if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
+  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');$('notice').scrollIntoView({behavior:'smooth',block:'center'});return;}
+  approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.discount,v.discountType,v.rounded);
+  $('reviewContent').innerHTML=`<div class="summaryrow"><span>Customer</span><strong>${esc(state.customer.contact_name)}</strong></div><div class="summaryrow"><span>Invoice date</span><strong>${esc(v.date)}</strong></div>${state.lines.map(l=>`<div class="summaryrow"><span>${esc(l.name)} · ${l.quantity} × ${l.pieces ?? "?"} = ${l.pieces ? pieceQuantity(l) : "?"} pieces</span><strong>${esc(money(pieceQuantity(l)*l.rate))}</strong></div>`).join('')}<div class="grandtotal"><span>Estimated invoice total</span><strong>${esc(money(t.total))}</strong></div><p>This creates a draft invoice. It does not email the customer. ERP will calculate the final total.</p>`;
+  $('saveStatus').textContent='';$('confirmSave').disabled=!!window.RAJADHANI_PREVIEW_CONFIG;if(window.RAJADHANI_PREVIEW_CONFIG)$('saveStatus').textContent='Preview only. No records will be created.';$('reviewDialog').showModal();
+});
+$('confirmSave').onclick=async()=>{
+  if(state.busy||state.saved||state.uncertain||!approvedPayload||window.RAJADHANI_PREVIEW_CONFIG)return;
+  state.busy=true;$('confirmSave').disabled=true;$('saveStatus').textContent='Saving invoice to ERP…';
+  try{const result=await api.createInvoice(approvedPayload);if(!result.invoice?.invoice_id)throw new Error('ERP did not return an invoice ID.');
+    state.saved=true;$('reviewDialog').close();$('invoiceNumber').value=result.invoice.invoice_number || result.invoice.invoice_id;$('saveButton').disabled=true;$('saveButton').textContent='Saved to ERP ✓';
+    notice(`Invoice ${result.invoice.invoice_number || result.invoice.invoice_id} saved in ERP (${result.invoice.status || 'created'}). Final total: ${money(Number(result.invoice.total))}.`,'success');
+    $('invoiceForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);
+    await api.refreshInvoices();
+  }catch(e){if(e.apiRejected){$('saveStatus').textContent=e.message;$('confirmSave').disabled=false;}else{state.uncertain=true;$('saveButton').disabled=true;$('saveStatus').textContent='Could not confirm the result. Check the ERP invoice list before starting again to avoid a duplicate. '+e.message;}}finally{state.busy=false;}
+};
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('customerSearch').focus();}});
+window.addEventListener('beforeunload',e=>{if(state.lines.length&&!state.saved){e.preventDefault();e.returnValue='';}});
+renderLines();await connect();
+</script></body></html>
