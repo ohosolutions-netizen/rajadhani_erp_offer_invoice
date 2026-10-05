@@ -366,7 +366,7 @@ $('resetButton').onclick=()=>$('resetDialog').showModal();$('confirmReset').oncl
 $('invoiceForm').addEventListener('submit',e=>{
   e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
   if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
-  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');$('notice').scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');return;}
   approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.discount,v.discountType,v.rounded);
   $('reviewContent').innerHTML=`<div class="summaryrow"><span>Customer</span><strong>${esc(state.customer.contact_name)}</strong></div><div class="summaryrow"><span>Invoice date</span><strong>${esc(v.date)}</strong></div>${state.lines.map(l=>`<div class="summaryrow"><span>${esc(l.name)} · ${l.quantity} × ${l.pieces ?? "?"} = ${l.pieces ? pieceQuantity(l) : "?"} pieces</span><strong>${esc(money(pieceQuantity(l)*l.rate))}</strong></div>`).join('')}<div class="grandtotal"><span>Estimated invoice total</span><strong>${esc(money(t.total))}</strong></div><p>This creates a draft invoice. It does not email the customer. ERP will calculate the final total.</p>`;
   $('saveStatus').textContent='';$('confirmSave').disabled=!!window.RAJADHANI_PREVIEW_CONFIG;if(window.RAJADHANI_PREVIEW_CONFIG)$('saveStatus').textContent='Preview only. No records will be created.';$('reviewDialog').showModal();

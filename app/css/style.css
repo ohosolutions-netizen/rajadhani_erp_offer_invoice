@@ -31,7 +31,7 @@ body{background:#eef2ef;font-size:11px;line-height:1.25}
 main{max-width:none;width:100%;height:100vh;overflow:hidden;padding:8px}
 .resetmini{position:absolute;right:40px;top:6px;z-index:6;min-height:24px;padding:3px 8px;font-size:10px;background:#fff}
 .breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
-.notice{position:absolute;left:8px;right:76px;top:6px;z-index:7;margin:0;padding:5px 8px;font-size:10px;border-radius:5px}
+.notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(760px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:12px 18px;font-size:14px;line-height:1.45;font-weight:650;text-align:center;border-radius:10px;box-shadow:0 12px 35px #26382f30}
 .notice.success{display:none}
 form,.workspace{height:100%;min-height:0}
 .workspace{grid-template-columns:minmax(0,1fr) 330px;gap:8px;align-items:stretch}
