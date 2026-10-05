@@ -91,6 +91,7 @@ async function copyText(text) {
 }
 const qty = n => Math.round(Number(n || 0) * 1000) / 1000;
 function renderPendingSO() {
+  if (!$('pendingSoItem')) return;
   const panel = state.pendingSO;
   $('pendingSoItem').textContent = panel.item?.name ? panel.item.name : 'Select or scan an item';
   $('pendingSoTotal').textContent = `Total pending: ${qty(panel.rows.reduce((s,r)=>s+r.pendingNos,0))} Nos`;
@@ -132,33 +133,9 @@ function pendingSalesOrderLine(order, invoiceLine) {
   };
 }
 async function loadPendingSO(line) {
-  if (!line?.item_id) {
-    state.pendingSO = { item: null, rows: [], loading: false, error: '' };
-    renderPendingSO();
-    return;
-  }
-  const item = { item_id: line.item_id, name: line.name, pieces: line.pieces };
-  state.pendingSO = { item, rows: [], loading: true, error: '' };
-  renderPendingSO();
-  try {
-    const query = $('location').value ? { location_id: $('location').value } : {};
-    const orders = (await api.all('/salesorders','salesorders',query)).filter(o => !o.status || ['open','confirmed','partially_invoiced'].includes(String(o.status).toLowerCase()));
-    const rows = [];
-    for (const summary of orders.slice(0, 75)) {
-      try {
-        const order = await api.salesOrder(summary.salesorder_id);
-        const row = pendingSalesOrderLine({...summary, ...order}, line);
-        if (row) rows.push(row);
-      } catch { /* Skip an SO detail that this user cannot read. */ }
-    }
-    if (String(state.pendingSO.item?.item_id) !== String(item.item_id)) return;
-    state.pendingSO = { item, rows, loading: false, error: '' };
-  } catch (err) {
-    if (String(state.pendingSO.item?.item_id) !== String(item.item_id)) return;
-    state.pendingSO = { item, rows: [], loading: false, error: err.message || String(err) };
-  }
-  renderPendingSO();
+  state.pendingSO = { item: null, rows: [], loading: false, error: '' };
 }
+
 function renderLines(focusIndex = null) {
   $('emptyItems').hidden = !!state.lines.length;
   $('lineItems').innerHTML = state.lines.map((l,i) => `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(pieceQuantity(l)*l.rate))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
