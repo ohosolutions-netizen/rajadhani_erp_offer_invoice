@@ -110,8 +110,8 @@ export function makePayload(state, values, config) {
   if (values.salesperson_id) payload.salesperson_id = String(values.salesperson_id);
   if (values.location_id) payload.location_id = String(values.location_id);
   if (values.shipping_gst_no) payload.shipping_gst_no = values.shipping_gst_no;
-  if (values.sameAsBilling) payload.shipping_address = state.customer.billing_address || {};
-  else if (state.customer.shipping_address) payload.shipping_address = state.customer.shipping_address;
+  if (values.shipping_address) payload.shipping_address = { address: values.shipping_address };
+  else if (values.sameAsBilling) payload.shipping_address = state.customer.billing_address || {};
   // Customer billing address and currency are deliberately inherited by ERP.
   return payload;
 }

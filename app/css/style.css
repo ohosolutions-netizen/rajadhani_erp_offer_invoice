@@ -48,6 +48,8 @@ kbd,.field small,.mappinghint,.unmapped,.tinybadge{display:none!important}
 .addressgrid{grid-template-columns:1fr 1fr;border-top:0;padding-top:0;gap:6px}
 .addresscard{padding:5px 7px;border-radius:4px;background:#f9fbf8}
 h3{font-size:10px}.address{font-size:10px;line-height:1.25;min-height:28px;max-height:40px;overflow:hidden;margin:3px 0}
+.editaddress{display:block;border:0;background:transparent;padding:0;width:100%;resize:none;color:var(--ink)}
+.editaddress:focus{background:#fff;border:1px solid #dce2de;padding:3px 5px;box-shadow:none}
 .compact{margin-top:3px}.compact input{min-height:23px;padding:3px 5px;font-size:10px}
 .more{border-top:0;margin-top:0;padding-top:0}.more summary{display:none}.more .grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:0}
 .itemsCard{min-height:0;display:flex;flex-direction:column}.itemsCard .cardbody{padding:6px 8px}

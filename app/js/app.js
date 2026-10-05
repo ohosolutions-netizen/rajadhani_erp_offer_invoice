@@ -38,7 +38,8 @@ async function exitAfterSave() {
 function fieldMarkup(key) {
   const f = config.customFields[key];
   const type = /phone|mobile|whatsapp/i.test(key) ? 'tel' : 'text';
-  const input = config.lookupSources[key] ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option></select>` : `<input id="cf_${key}" type="${type}" ${f.required ? 'required' : ''} placeholder="${key === 'billCreatedBy' ? 'Current ERP user' : esc(f.label)}">`;
+  const fixedOptions = key === 'billType' ? ['Cash','Credit','Credit-Account'] : null;
+  const input = fixedOptions ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option>${fixedOptions.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>` : config.lookupSources[key] ? `<select id="cf_${key}" ${f.required ? 'required' : ''}><option value="">Select ${esc(f.label.toLowerCase())}</option></select>` : `<input id="cf_${key}" type="${type}" ${f.required ? 'required' : ''} placeholder="${key === 'billCreatedBy' ? 'Current ERP user' : esc(f.label)}">`;
   if (key === 'pending') return `<label class="check"><input id="cf_pending" type="checkbox"> Invoice pending</label>${!f.id ? '<small class="unmapped">Not sent until mapped</small>' : ''}`;
   return `<div class="field"><label for="cf_${key}">${esc(f.label)} ${f.required && f.id ? '<em>*</em>' : ''}</label>${input}${!f.id ? '<small class="mappinghint">Not sent to ERP yet</small>' : ''}</div>`;
 }
@@ -48,7 +49,7 @@ $('pendingField').innerHTML = fieldMarkup('pending');
 $('invoiceDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
 function getValues() {
   return { date: $('invoiceDate').value, place_of_supply: $('placeOfSupply').value.trim().toUpperCase(), payment_terms: $('paymentTerms').value === '' ? 0 : Number($('paymentTerms').value), salesperson_id: $('salesperson').value, location_id: $('location').value,
-    shipping_gst_no: $('shippingGst').value.trim(), notes: $('notes').value.trim(), sameAsBilling: $('sameAsBilling').checked,
+    shipping_gst_no: $('shippingGst').value.trim(), shipping_address: $('shippingAddress').value.trim(), notes: $('notes').value.trim(), sameAsBilling: $('sameAsBilling').checked,
     discount: Number($('discount').value), discountType: $('discountType').value, rounded: $('roundOff').checked,
     custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, k === 'pending' ? $('cf_pending').checked : $(`cf_${k}`).value.trim()])) };
 }
@@ -173,7 +174,10 @@ $('lineItems').addEventListener('click', e => {
 });
 ['discount','discountType','roundOff'].forEach(id=>$(id).addEventListener('input',totals));
 function address(a) { return a ? [a.attention,a.address,a.street2,[a.city,a.state,a.zip].filter(Boolean).join(', '),a.country].filter(Boolean).join('\n') || 'No address recorded in ERP.' : 'No address recorded in ERP.'; }
-function addresses() { $('billingAddress').textContent=address(state.customer?.billing_address);$('shippingAddress').textContent=address($('sameAsBilling').checked ? state.customer?.billing_address : state.customer?.shipping_address); }
+function addresses() {
+  $('billingAddress').textContent=address(state.customer?.billing_address);
+  $('shippingAddress').value=$('sameAsBilling').checked && state.customer ? address(state.customer.billing_address) : '';
+}
 $('sameAsBilling').addEventListener('change', addresses);
 function selectOptions(id, records, idKey, nameKey, placeholder) { const current=$(id).value;$(id).replaceChildren(new Option(placeholder,''),...records.filter(r=>r.status!=='inactive'&&r.is_active!==false).map(r=>new Option(r[nameKey] || r.name || String(r[idKey]),String(r[idKey]))));if(records.some(r=>String(r[idKey])===current))$(id).value=current; }
 async function chooseCustomer(record) {
@@ -199,13 +203,24 @@ async function chooseCustomer(record) {
     requestAnimationFrame(() => $('itemSearch').focus());
   }catch(e){if(version===state.customerVersion){error(e);$('customerHint').textContent=state.customer?'Customer loaded; sales order lookup failed.':'Could not load customer. Search again.';$('salesOrder').replaceChildren(new Option('Sales orders unavailable',''));}}finally{pending(-1);}
 }
-function searchable(inputId, resultsId, search, key, describe, choose) {
+function searchable(inputId, resultsId, search, key, describe, choose, options = {}) {
   const input=$(inputId), box=$(resultsId); let timer, sequence=0, page=1, query='';
   const close=()=>{box.hidden=true;input.setAttribute('aria-expanded','false');};
-  async function run(append=false) {
+  const normalized = value => String(value || '').trim().toLocaleLowerCase();
+  const scannerMatch = (records, text) => {
+    const needle = normalized(text);
+    const exact = records.find(r => [r.sku, r.item_code, r.item_code_formatted, r.barcode, r.ean, r.upc, r.name].some(v => normalized(v) === needle));
+    return exact || (records.length === 1 ? records[0] : null);
+  };
+  async function run(append=false, autoChoose=false) {
+    clearTimeout(timer);
     const token=++sequence; if(!append){page=1;query=input.value.trim();box.innerHTML='<p>Searching ERP…</p>';}
     box.hidden=false;input.setAttribute('aria-expanded','true');
     try { const r=await search(query,page);if(token!==sequence)return;const records=(r[key]||[]).filter(x=>x.status!=='inactive' && x.is_active!==false);
+      if (autoChoose) {
+        const record = scannerMatch(records, query);
+        if (record) { box.replaceChildren(); close(); await choose(record); return; }
+      }
       if(!append)box.replaceChildren();else box.querySelector('[data-more]')?.remove();
       if(!records.length&&!append)box.innerHTML='<p>No matching records. Try a different search.</p>';
       records.forEach(record=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','option');const [name,detail]=describe(record);b.innerHTML=`${esc(name)}<span>${esc(detail)}</span>`;b.onclick=async()=>{close();try{await choose(record);}catch(e){error(e);}};box.append(b);});
@@ -213,7 +228,7 @@ function searchable(inputId, resultsId, search, key, describe, choose) {
     }catch(e){if(token===sequence)box.innerHTML=`<p>${esc(e.message)}</p>`;}
   }
   input.addEventListener('input',()=>{sequence++;clearTimeout(timer);box.replaceChildren();close();timer=setTimeout(()=>run(),280);});
-  input.addEventListener('keydown',e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'){e.preventDefault();const options=box.querySelectorAll('button[role=option]');if(options.length===1&&!box.hidden)options[0].click();else run();}});
+  input.addEventListener('keydown',async e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'){e.preventDefault();if(box.hidden)run();else box.querySelector('button')?.focus();}if(e.key==='Enter'){e.preventDefault();const choices=box.querySelectorAll('button[role=option]');if(choices.length===1&&!box.hidden)choices[0].click();else await run(false, !!options.scanOnEnter);}});
   box.addEventListener('keydown',e=>{const buttons=[...box.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(index+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}if(e.key==='Escape'){close();input.focus();}});
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==input)close();});
   return run;
@@ -296,7 +311,7 @@ async function addItem(record) {
     $('itemSearch').value='';renderLines(targetIndex);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();
   }finally{pending(-1);}
 }
-const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem);
+const browse=searchable('itemSearch','itemResults',(q,p)=>api.searchItems(q,p),'items',i=>[i.name,`${i.sku || 'No SKU'} · ${money(Number(i.rate||0))} · Stock ${i.available_stock ?? i.stock_on_hand ?? '—'}`],addItem,{scanOnEnter:true});
 $('browseItems').onclick=()=>{$('itemSearch').focus();browse();};
 $('salesOrder').addEventListener('change',async()=>{
   if(!$('salesOrder').value)return;
@@ -315,7 +330,7 @@ async function loadLookups() {
     {name:'taxes',run:async()=>{state.taxes=(await api.all('/settings/taxes','taxes')).filter(t=>t.is_active!==false).map(normalizeTax);renderLines();}},
     {name:'salespersons',run:async()=>{const source=config.lookupSources.salesperson;if(source)selectOptions('salesperson',await api.all(source.path,source.key,source.query),source.idKey,source.labelKey,'Select salesperson');else selectOptions('salesperson',await api.salespersons(),'salesperson_id','salesperson_name','Select salesperson');}},
     {name:'locations',run:async()=>{selectOptions('location',await api.all('/locations','locations'),'location_id','location_name','Organization default');}},
-    ...Object.entries(config.lookupSources).filter(([key])=>key!=='salesperson').map(([key,source])=>({name:config.customFields[key]?.label||key,run:async()=>{if(!$(`cf_${key}`))return;selectOptions(`cf_${key}`,await api.all(source.path,source.key,source.query),source.idKey,source.labelKey,`Select ${config.customFields[key].label.toLowerCase()}`);}}))
+    ...Object.entries(config.lookupSources).filter(([key])=>key!=='salesperson'&&key!=='billType').map(([key,source])=>({name:config.customFields[key]?.label||key,run:async()=>{if(!$(`cf_${key}`))return;selectOptions(`cf_${key}`,await api.all(source.path,source.key,source.query),source.idKey,source.labelKey,`Select ${config.customFields[key].label.toLowerCase()}`);}}))
   ];
   const results=await Promise.allSettled(jobs.map(j=>j.run()));const failures=results.flatMap((r,i)=>r.status==='rejected'?[`${jobs[i].name}: ${r.reason.message}`]:[]);
   if(failures.length)notice(`Some ERP lists could not load. ${failures.join(' • ')}`,'error');
