@@ -55,8 +55,12 @@ function getValues() {
 }
 function totals() {
   const v = getValues(); const t = calculate(state.lines, v.discount, v.discountType, v.rounded);
-  for (const [id, key] of Object.entries({subtotal:'subtotal',discountAmount:'discount',taxable:'taxable',taxTotal:'tax',roundValue:'adjustment',grandTotal:'total'})) $(id).textContent = `${id === 'discountAmount' ? '− ' : ''}${money(t[key])}`;
-  $('taxBreakdown').innerHTML = t.taxes.map(([name, amount]) => `<div class="summaryrow"><span>${esc(name)}</span><span>${esc(money(amount))}</span></div>`).join('');
+  for (const [id, key] of Object.entries({subtotal:'subtotal',discountAmount:'discount',taxTotal:'tax',roundValue:'adjustment',grandTotal:'total'})) $(id).textContent = `${id === 'discountAmount' ? '− ' : ''}${money(t[key])}`;
+  const intraState = v.place_of_supply === 'KL';
+  const halfTax = Math.round((t.tax / 2 + Number.EPSILON) * 100) / 100;
+  $('taxBreakdown').innerHTML = intraState
+    ? `<div class="summaryrow"><span>CGST</span><span>${esc(money(halfTax))}</span></div><div class="summaryrow"><span>SGST</span><span>${esc(money(t.tax - halfTax))}</span></div>`
+    : `<div class="summaryrow"><span>IGST</span><span>${esc(money(t.tax))}</span></div>`;
   $('totalDetail').textContent = `${state.lines.length} item${state.lines.length === 1 ? '' : 's'} in this invoice`;
   $('lineCount').textContent = state.lines.length;
   $('qtySummary').textContent = `${state.lines.length} items · ${Math.round(state.lines.reduce((s,l)=>s+l.quantity,0)*1000)/1000} order qty · ${Math.round(state.lines.reduce((s,l)=>s+(l.pieces ? pieceQuantity(l) : 0),0)*1000)/1000} pieces`;
