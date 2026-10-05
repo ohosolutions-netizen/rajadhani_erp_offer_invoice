@@ -16,7 +16,7 @@ function hasUnsavedWork() {
   if (state.customer || state.lines.length) return true;
   const ids = ['customerSearch','itemSearch','placeOfSupply','paymentTerms','shippingGst','shippingAddress','notes','discount'];
   if (ids.some(id => String($(id)?.value || '').trim() && String($(id)?.value || '').trim() !== '0')) return true;
-  return Object.keys(config.customFields).some(k => k !== 'pending' && String($(`cf_${k}`)?.value || '').trim()) || $('cf_pending')?.checked || $('roundOff')?.checked;
+  return Object.keys(config.customFields).some(k => k !== 'pending' && String($(`cf_${k}`)?.value || '').trim()) || $('cf_pending')?.checked;
 }
 function invoiceListUrl() {
   const orgId = encodeURIComponent(config.organizationId || api.organization?.organization_id || '');
