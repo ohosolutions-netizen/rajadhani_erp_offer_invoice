@@ -32,13 +32,16 @@ body{background:#eef2ef;font-size:11px;line-height:1.25}
 main{max-width:none;width:100%;height:100vh;overflow:hidden;padding:8px}
 .resetmini{position:absolute;right:40px;top:6px;z-index:6;min-height:24px;padding:3px 8px;font-size:10px;background:#fff}
 .breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
-.notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(820px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:13px 20px 13px 18px;font-size:14px;line-height:1.45;font-weight:700;text-align:center;border-radius:14px;box-shadow:0 18px 45px #6b3a2338;display:flex;align-items:center;justify-content:center;gap:11px;border:1px solid #f0b38d;border-left:6px solid #d75b32;background:linear-gradient(135deg,#fff9f3 0%,#fff0e5 100%);color:#7c341b;letter-spacing:.01em}
-.notice:before{content:'!';display:inline-grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:999px;background:#d75b32;color:#fff;font-weight:850;font-size:15px;line-height:1;box-shadow:0 5px 14px #d75b3240}
+.notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(820px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:12px 14px 12px 18px;font-size:14px;line-height:1.45;font-weight:700;text-align:center;border-radius:12px;box-shadow:0 18px 45px #00000042;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid #2b2f33;background:#111827;color:#fff;letter-spacing:.01em}
+.notice:before{content:'!';display:inline-grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:999px;background:#fff;color:#111827;font-weight:850;font-size:15px;line-height:1}
+.notice #noticeText{flex:1;min-width:0;color:#fff}
+.noticeclose{flex:0 0 28px;width:28px;height:28px;border:1px solid #ffffff30;border-radius:999px;background:#ffffff12;color:#fff;font-size:20px;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer}
+.noticeclose:hover,.noticeclose:focus{background:#fff;color:#111827;outline:none}
 .notice[hidden]{display:none!important}
 .notice.success{display:none}
-.notice.error{background:linear-gradient(135deg,#fff7ed 0%,#ffe4d5 100%);border-color:#f2a077;border-left-color:#c2410c;color:#7c2d12;box-shadow:0 18px 45px #7c2d1238}
-.notice.error:before{background:#c2410c;box-shadow:0 5px 14px #c2410c45}
-.notice:not(.error):not(.success):before{content:'i';background:#477868;box-shadow:0 5px 14px #47786835}
+.notice.error{background:#111827;border-color:#2b2f33;color:#fff;box-shadow:0 18px 45px #00000042}
+.notice.error:before{background:#fff;color:#111827}
+.notice:not(.error):not(.success):before{content:'i';background:#fff;color:#111827}
 form,.workspace{height:100%;min-height:0}
 .workspace{grid-template-columns:minmax(0,1fr) 330px;gap:8px;align-items:stretch;overflow:hidden}
 .maincolumn{display:grid;grid-template-rows:auto auto;gap:8px;min-height:0;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;padding-right:2px}
@@ -116,7 +119,7 @@ dialog{border-radius:7px}
 <body>
 <header class="topbar compacttools"><span id="connectionStatus" class="status">Connecting to ERP</span><button type="button" class="iconbutton" id="settingsButton" aria-label="Connection settings">⚙</button><span class="avatar" id="avatar">R</span></header>
 <main><button type="button" id="resetButton" class="button quiet resetmini">↺ Start over</button>
-<div id="notice" class="notice" role="status" hidden></div>
+<div id="notice" class="notice" role="status" hidden><span id="noticeText"></span><button type="button" id="noticeClose" class="noticeclose" aria-label="Close warning">×</button></div>
 <form id="invoiceForm"><div class="workspace"><div class="maincolumn">
 <section class="card"><div class="sectionheading"><div><span class="step">01</span><h2>Customer & invoice</h2></div><span class="subtle">Start with who you’re billing</span></div><div class="cardbody"><div class="grid customergrid"><div class="field searchfield"><label for="customerSearch">Customer <em>*</em></label><div class="searchbox"><span>⌕</span><input id="customerSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="customerResults" placeholder="Search customers by name…" required><kbd>⌘ K</kbd></div><div id="customerResults" class="results" role="listbox" hidden></div><small id="customerHint">Search your ERP customer directory</small></div><div class="field"><label for="invoiceDate">Invoice date <em>*</em></label><input id="invoiceDate" type="date" required></div><div class="field"><label for="invoiceNumber">Invoice number</label><input id="invoiceNumber" readonly placeholder="Assigned by ERP" class="mutedinput"></div></div>
 <div class="grid twofields"><div class="field"><label for="salesOrder">Sales order</label><select id="salesOrder" disabled><option value="">Select a customer first</option></select></div><div class="field"><label for="salesperson">Salesperson <em>*</em></label><select id="salesperson"><option value="">Select salesperson</option></select></div></div>
@@ -420,8 +423,9 @@ const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: fal
 let approvedPayload = null;
 function pending(delta) { state.pendingOperations += delta; $('saveButton').disabled = state.pendingOperations > 0 || state.saved || state.uncertain; }
 const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: state.currency }).format(Number.isFinite(n) ? n : 0);
-function notice(message, kind = '') { $('notice').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
+function notice(message, kind = '') { $('noticeText').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
 function error(err) { notice(err.message || String(err), 'error'); }
+$('noticeClose').addEventListener('click', () => notice(''));
 function hasUnsavedWork() {
   if (state.saved || state.allowClose) return false;
   if (state.customer || state.lines.length) return true;

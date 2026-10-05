@@ -9,8 +9,9 @@ const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: fal
 let approvedPayload = null;
 function pending(delta) { state.pendingOperations += delta; $('saveButton').disabled = state.pendingOperations > 0 || state.saved || state.uncertain; }
 const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: state.currency }).format(Number.isFinite(n) ? n : 0);
-function notice(message, kind = '') { $('notice').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
+function notice(message, kind = '') { $('noticeText').textContent = message; $('notice').className = `notice ${kind}`; $('notice').hidden = !message; }
 function error(err) { notice(err.message || String(err), 'error'); }
+$('noticeClose').addEventListener('click', () => notice(''));
 function hasUnsavedWork() {
   if (state.saved || state.allowClose) return false;
   if (state.customer || state.lines.length) return true;
