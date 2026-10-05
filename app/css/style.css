@@ -78,6 +78,7 @@ aside{min-height:0}.summary{height:100%;position:static;display:flex;flex-direct
 .summaryrow{font-size:10px;margin:0}.discountbox{border-top:0;margin:0;padding:0}.discountinput input,.discountinput select{min-height:24px;padding:2px 5px;font-size:10px}.discountinput select{width:58px}
 .grandtotal{margin:0;padding:8px;border-radius:5px}.grandtotal strong{font-size:22px;margin:0}.grandtotal small,.grandtotal>span{font-size:9px}
 #pendingField{margin:0}.full{min-height:30px;padding:5px 9px}.results{max-height:185px;font-size:10px;border-radius:4px}.results button{padding:6px}
-#saveButton{position:sticky;bottom:0;z-index:3;margin-top:auto;justify-content:center;gap:8px;box-shadow:0 -4px 14px #eef2ef,0 3px 8px #d75b3224}
+#saveButton{position:fixed;right:18px;bottom:14px;width:300px;z-index:20;justify-content:center;gap:8px;min-height:42px;font-size:13px;box-shadow:0 -4px 14px #eef2ef,0 3px 12px #d75b3240}
+.summary .cardbody{padding-bottom:58px}
 dialog{border-radius:7px}
 @media(max-width:950px){main{height:auto;overflow:auto}.workspace{grid-template-columns:1fr}.summary{height:auto}.tablewrap{overflow-x:auto}.more .grid,.three,.customergrid,.addressgrid,.twoslim,.summarygrid{grid-template-columns:1fr 1fr}}
