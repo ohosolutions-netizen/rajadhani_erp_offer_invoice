@@ -52,6 +52,17 @@ export function itemPacking(item, fields = {}) {
   return {mu:mu || 'Unknown',pieces:null,packingError:'M Unit must be Set or Pieces. Map M Unit and Ratio to the item master fields.'};
 }
 export const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
+export function taxPreference(preferences = [], intraState = true) {
+  const value = tax => `${tax?.tax_name || tax?.tax_group_name || tax?.name || ''}`.toLowerCase();
+  const specification = tax => String(tax?.tax_specification || '').toLowerCase();
+  const type = tax => String(tax?.tax_specific_type || '').toLowerCase();
+  return intraState
+    ? preferences.find(tax => specification(tax) === 'intra')
+      || preferences.find(tax => type(tax) === 'tax' && !value(tax).includes('igst'))
+    : preferences.find(tax => specification(tax) === 'inter')
+      || preferences.find(tax => type(tax) === 'igst')
+      || preferences.find(tax => value(tax).includes('igst'));
+}
 export function lineAmounts(line) {
   const gross = round(pieceQuantity(line) * line.rate);
   const discount = round(gross * (line.discount ?? 0) / 100);
@@ -101,16 +112,20 @@ export function validateInvoice(state, values, config) {
   return [...new Set(errors)];
 }
 export function makePayload(state, values, config) {
-  const totals = calculate(state.lines, values.rounded, values.place_of_supply === (config.organizationStateCode || 'KL'));
+  const intraState = values.place_of_supply === (config.organizationStateCode || 'KL');
+  const totals = calculate(state.lines, values.rounded, intraState);
   const payload = {
     customer_id: String(state.customer.contact_id), date: values.date,
     place_of_supply: values.place_of_supply,
-    line_items: state.lines.filter(l => !l.notFound).map((l, index) => ({
+    line_items: state.lines.filter(l => !l.notFound).map((l, index) => {
+      const preferredTax = taxPreference(l.taxPreferences, intraState);
+      const taxId = preferredTax?.tax_id || preferredTax?.tax_group_id || (!l.taxPreferences?.length ? l.tax?.id : null);
+      return ({
       item_id: String(l.item_id), quantity: config.invoiceQuantityMode === 'pieces' ? pieceQuantity(l) : l.quantity, rate: config.invoiceQuantityMode === 'order' ? l.rate * (l.pieces ?? 1) : l.rate, item_order: index + 1,
       discount: `${l.discount ?? 0}%`,
-      ...(l.tax ? { tax_id: String(l.tax.id) } : { tax_exemption_id: l.tax_exemption_id }),
+      ...(taxId ? { tax_id: String(taxId) } : { tax_exemption_id: l.tax_exemption_id }),
       ...(l.salesorder_item_id ? { salesorder_item_id: String(l.salesorder_item_id) } : {})
-    })),
+    });}),
     discount_type: 'item_level', is_discount_before_tax: true, is_inclusive_tax: false,
     adjustment: totals.adjustment, adjustment_description: 'Rounding', notes: values.notes,
     custom_fields: Object.entries(config.customFields).filter(([k, m]) => m.id && values.custom[k] !== '' && values.custom[k] != null).map(([k, m]) => ({ customfield_id: String(m.id), value: values.custom[k] }))

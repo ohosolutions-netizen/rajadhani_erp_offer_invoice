@@ -1,5 +1,5 @@
 import { ERP } from './erp.js';
-import { calculate, validateInvoice, makePayload, pieceQuantity, itemPacking, lineAmounts } from './core.js';
+import { calculate, validateInvoice, makePayload, pieceQuantity, itemPacking, lineAmounts, taxPreference } from './core.js';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const config = await fetch(new URL('../config.json', import.meta.url)).then(r => { if (!r.ok) throw new Error('Cannot load widget configuration'); return r.json(); });
@@ -189,7 +189,7 @@ async function chooseCustomer(record) {
     $('cf_mobile').value=c.mobile || c.contact_persons?.find(p=>p.is_primary_contact)?.mobile || c.phone || '';
     $('cf_shippingPhone').value=c.shipping_address?.phone || '';
     for(const [k,m] of Object.entries(config.customFields)) { const source=(c.custom_fields||[]).find(f=>m.customerApiName && f.api_name===m.customerApiName); if(source && $(`cf_${k}`))$(`cf_${k}`).value=source.value ?? ''; }
-    addresses();totals();
+    addresses();applySupplyTaxes();
     const orders=await api.all('/salesorders','salesorders',{customer_id:c.contact_id}); if(version!==state.customerVersion)return;
     selectOptions('salesOrder',orders.filter(o=>['open','confirmed','partially_invoiced'].includes(o.status)),'salesorder_id','salesorder_number','No sales order');$('salesOrder').disabled=false;
     requestAnimationFrame(() => $('itemSearch').focus());
@@ -228,12 +228,16 @@ function searchable(inputId, resultsId, search, key, describe, choose, options =
 searchable('customerSearch','customerResults',(q,p)=>api.searchCustomers(q,p),'contacts',c=>[c.contact_name,[c.company_name,c.mobile || c.email].filter(Boolean).join(' · ')],chooseCustomer);
 $('customerSearch').addEventListener('input',()=>{state.customerVersion++;state.customer=null;$('salesOrder').disabled=true;$('salesOrder').replaceChildren(new Option('Select a customer first',''));$('gstNumber').value='';$('shippingGst').value='';$('placeOfSupply').value='';['mobile','whatsapp','shippingPhone'].forEach(k=>$(`cf_${k}`).value='');$('customerHint').textContent='Choose a matching ERP customer';addresses();});
 function normalizeTax(t){return {id:String(t.tax_id || t.tax_group_id || t.id || ''),name:t.tax_name || t.tax_group_name || t.name || t.tax_name_formatted || t.text,percentage:Number(t.tax_percentage ?? t.tax_group_percentage ?? t.percentage ?? 0)};}
-function itemTax(item) {
+function isIntraState() {
+  const supply = $('placeOfSupply').value.trim().toUpperCase();
+  return !supply || supply === (config.organizationStateCode || 'KL');
+}
+function itemTax(item, intraState=isIntraState()) {
   const preferences = item.item_tax_preferences || [];
-  const preferred = preferences.find(t => String(t.tax_specification || '').toLowerCase() === 'intra')
-    || preferences.find(t => String(t.tax_specific_type || '').toLowerCase() === 'tax')
-    || preferences[0]
-    || item;
+  const preferred = taxPreference(preferences, intraState)
+    || (intraState ? preferences[0] : null)
+    || (!preferences.length ? item : null);
+  if (!preferred) return null;
   const id = preferred.tax_id || preferred.tax_group_id || item.tax_id;
   if (!id) return null;
   const existing = state.taxes.find(t => String(t.id) === String(id));
@@ -245,6 +249,16 @@ function itemTax(item) {
   }
   return null;
 }
+function applySupplyTaxes() {
+  const supply = $('placeOfSupply').value.trim().toUpperCase();
+  if (supply && !/^[A-Z]{2}$/.test(supply)) { totals(); return; }
+  state.lines.forEach(line => {
+    if (!line.taxPreferences?.length) return;
+    line.tax = itemTax({item_tax_preferences:line.taxPreferences}, isIntraState());
+  });
+  renderLines();
+}
+$('placeOfSupply').addEventListener('input', applySupplyTaxes);
 function debugSnapshot(selectedRecord, itemResponse, masterId, masterResponse, mergedItem, masterError) {
   const clean = value => JSON.parse(JSON.stringify(value, (key, data) => key === '__rajadhaniDebug' ? undefined : data));
   return {
@@ -291,7 +305,7 @@ async function fullItem(record) {
 async function lineFromItem(item, extra={}) {
   const tax = itemTax(item);
   const packing = itemPacking(item, config.itemFields);
-  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,discount:0,tax,tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
+  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,discount:0,tax,taxPreferences:item.item_tax_preferences || [],tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
 }
 function quickLineFromRecord(record) {
   return {item_id:String(record.item_id),name:record.name || record.item_name || record.sku || 'Scanned item',sku:record.sku || record.item_code,hsn_or_sac:record.hsn_or_sac,stock:record.available_stock ?? record.stock_on_hand,unit:record.unit,rate:Number(record.rate||0),quantity:1,tax:null,tax_exemption_id:record.tax_exemption_id,mu:record.unit || '',pieces:null,loading:true};

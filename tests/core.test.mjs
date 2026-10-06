@@ -26,6 +26,14 @@ test('not found scan rows are ignored in totals and block save until removed',()
 test('reject invalid quantities and excessive discounts while allowing unmapped custom fields',()=>{const errors=validateInvoice({...state,lines:[{...lines[0],quantity:0,discount:110}]},{...values,discount:110},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(errors.some(e=>e.includes('quantity')));assert.ok(errors.some(e=>e.includes('discount')));assert.ok(!errors.some(e=>e.includes('custom-field ID')));});
 test('required custom fields are enforced even before their ERP field is mapped',()=>{const errors=validateInvoice(state,{...values,custom:{transport:''}},config);assert.ok(errors.some(e=>e.includes('Transport is required')));const unmapped=validateInvoice(state,{...values,custom:{transport:''}},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(unmapped.some(e=>e.includes('Transport is required')));});
 test('payload preserves IDs, mappings, tax IDs and links without sending email',()=>{const p=makePayload(state,{...values,shipping_address:'Manual shipping'},config);assert.equal(p.customer_id,'9876543210987654321');assert.equal(p.line_items[0].item_id,'1234567890123456789');assert.equal(p.line_items[0].tax_id,'t18');assert.equal(p.discount,undefined);assert.equal(p.discount_type,'item_level');assert.equal(p.is_discount_before_tax,true);assert.equal(p.line_items[0].discount,'0%');assert.deepEqual(p.custom_fields,[{customfield_id:'cf1',value:'Own delivery'}]);assert.deepEqual(p.shipping_address,{address:'Manual shipping'});assert.equal(p.send,undefined);});
+test('interstate payload uses the item IGST preference',()=>{
+ const line={...lines[0],taxPreferences:[
+  {tax_specification:'intra',tax_specific_type:'tax',tax_id:'gst18',tax_name:'GST 18',tax_percentage:18},
+  {tax_specification:'inter',tax_specific_type:'igst',tax_id:'igst18',tax_name:'IGST 18',tax_percentage:18}
+ ]};
+ assert.equal(makePayload({...state,lines:[line]},values,config).line_items[0].tax_id,'gst18');
+ assert.equal(makePayload({...state,lines:[line]},{...values,place_of_supply:'TN'},config).line_items[0].tax_id,'igst18');
+});
 test('same-as-billing uses billing address without editing the customer',()=>assert.equal(makePayload(state,{...values,sameAsBilling:true},config).shipping_address.city,'Kochi'));
 test('editable shipping address overrides customer shipping address',()=>assert.deepEqual(makePayload(state,{...values,shipping_address:'Edited Ship Address'},config).shipping_address,{address:'Edited Ship Address'}));
 test('customer shipping address is not copied unless provided or same-as-billing is checked',()=>assert.equal(makePayload(state,values,config).shipping_address,undefined));

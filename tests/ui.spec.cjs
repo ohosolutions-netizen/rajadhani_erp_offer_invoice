@@ -13,7 +13,21 @@ test('production SDK adapter sends one draft creation and locks after success',a
  const mock=fs.readFileSync('preview/mock-sdk.js','utf8');
  await page.route('**/zf_sdk.js',r=>r.fulfill({contentType:'text/javascript',body:mock+`;window.testConfig=window.RAJADHANI_PREVIEW_CONFIG;delete window.RAJADHANI_PREVIEW_CONFIG;const originalRequest=window.ZFAPPS.request;window.sent=[];window.ZFAPPS.request=async o=>{if(o.method==='POST'){window.sent.push(o);return {data:{body:JSON.stringify({code:0,invoice:{invoice_id:'created1',invoice_number:'INV-TEST',status:'draft',total:319.2}})}};}return originalRequest(o);};`}));
  await page.route('**/app/config.json',r=>{const c=JSON.parse(fs.readFileSync('app/config.json'));c.connectionLinkName='test';c.invoiceQuantityMode='pieces';for(const [k,v]of Object.entries(c.customFields)){v.id='test-'+k;v.required=false;}c.requireSalesperson=false;r.fulfill({json:c});});
- await page.goto('/app/widget.html');await expect(page.locator('#connectionStatus')).toHaveText('ERP connected');await customer(page);await item(page,'Premium');await page.locator('[data-field=discount]').fill('12.5');await page.locator('#saveButton').click();await page.locator('#confirmSave').click();await expect(page.locator('#notice')).toContainText('INV-TEST saved');await expect(page.locator('#saveButton')).toBeDisabled();const sent=await page.evaluate(()=>window.sent);expect(sent.length).toBe(1);expect(sent[0].connection_link_name).toBe('test');expect(sent[0].url_query).toContainEqual({key:'send',value:'false'});const payload=JSON.parse(sent[0].body.raw);expect(payload.line_items[0].item_id).toBe('i1');expect(payload.line_items[0].discount).toBe('12.5%');expect(payload.discount_type).toBe('item_level');expect(payload.is_discount_before_tax).toBe(true);expect(payload.discount).toBeUndefined();expect(payload.adjustment).toBe(-0.01);
+ await page.goto('/app/widget.html');await expect(page.locator('#connectionStatus')).toHaveText('ERP connected');await customer(page);await item(page,'Premium');await page.locator('[data-field=discount]').fill('12.5');await page.locator('#placeOfSupply').fill('TN');await expect(page.locator('[data-field=tax]')).toHaveValue('it12');await page.locator('#saveButton').click();await page.locator('#confirmSave').click();await expect(page.locator('#notice')).toContainText('INV-TEST saved');await expect(page.locator('#saveButton')).toBeDisabled();const sent=await page.evaluate(()=>window.sent);expect(sent.length).toBe(1);expect(sent[0].connection_link_name).toBe('test');expect(sent[0].url_query).toContainEqual({key:'send',value:'false'});const payload=JSON.parse(sent[0].body.raw);expect(payload.line_items[0].item_id).toBe('i1');expect(payload.line_items[0].tax_id).toBe('it12');expect(payload.place_of_supply).toBe('TN');expect(payload.line_items[0].discount).toBe('12.5%');expect(payload.discount_type).toBe('item_level');expect(payload.is_discount_before_tax).toBe(true);expect(payload.discount).toBeUndefined();expect(payload.adjustment).toBe(0);
+});
+
+test('place of supply switches loaded items between GST and IGST',async({page})=>{
+ await start(page);await customer(page);await scanItem(page,'PAP-A4-75');
+ const tax=page.locator('[data-field=tax]').first();
+ await expect(tax).toHaveValue('t12');
+ await expect(page.locator('#taxBreakdown')).toContainText('CGST');
+ await page.locator('#placeOfSupply').fill('TN');
+ await expect(tax).toHaveValue('it12');
+ await expect(tax.locator('option:checked')).toHaveText('IGST 12 (12%)');
+ await expect(page.locator('#taxBreakdown')).toContainText('IGST');
+ await expect(page.locator('#taxBreakdown')).not.toContainText('CGST');
+ await page.locator('#placeOfSupply').fill('KL');
+ await expect(tax).toHaveValue('t12');
 });
 
 test('line discount amounts and summary update after editing and removing rows',async({page})=>{
