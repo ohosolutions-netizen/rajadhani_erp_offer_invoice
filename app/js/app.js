@@ -1,5 +1,5 @@
 import { ERP } from './erp.js';
-import { calculate, validateInvoice, makePayload, pieceQuantity, itemPacking, lineAmounts, taxPreference, hasValidDiscount } from './core.js';
+import { calculate, validateInvoice, makePayload, pieceQuantity, itemPacking, lineAmounts, taxPreference, hasValidDiscount, invoiceDetailUrl } from './core.js';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const config = await fetch(new URL('../config.json', import.meta.url)).then(r => { if (!r.ok) throw new Error('Cannot load widget configuration'); return r.json(); });
@@ -19,29 +19,15 @@ function hasUnsavedWork() {
   if (ids.some(id => String($(id)?.value || '').trim() && String($(id)?.value || '').trim() !== '0')) return true;
   return Object.keys(config.customFields).some(k => String($(`cf_${k}`)?.value || '').trim());
 }
-function invoiceListUrl() {
-  const orgId = encodeURIComponent(config.organizationId || api.organization?.organization_id || '');
-  return orgId ? `https://erp.zoho.in/app/${orgId}#/invoices?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D` : 'https://erp.zoho.in/app';
-}
-async function exitAfterSave() {
+async function exitAfterSave(invoiceId) {
   await new Promise(resolve => setTimeout(resolve, 900));
-  try {
-    if (window.ZFAPPS?.closeModal) {
-      await window.ZFAPPS.closeModal();
-      return;
-    }
-  } catch { /* Continue with browser/webtab fallbacks. */ }
-  try {
-    window.open('', '_self');
-    window.close();
-  } catch { /* Some browsers block closing tabs not opened by script. */ }
-  setTimeout(() => {
-    if (document.visibilityState === 'hidden') return;
-    const url = invoiceListUrl();
-    try { window.top.location.href = url; return; } catch { /* Cross-origin webtabs can block top navigation. */ }
-    try { window.parent.location.href = url; return; } catch { /* Fall through to iframe/current-page navigation. */ }
-    window.location.href = url;
-  }, 700);
+  const organizationId=config.organizationId || api.organization?.organization_id;
+  const url=invoiceDetailUrl(organizationId,invoiceId);
+  try { window.top.location.href=url; return; } catch { /* Cross-origin webtabs can block top navigation. */ }
+  try { window.parent.location.href=url; return; } catch { /* Fall through to the widget frame. */ }
+  try { window.location.href=url; } catch {
+    try { await window.ZFAPPS?.closeModal?.(); } catch { /* Leave the saved confirmation visible. */ }
+  }
 }
 function fieldMarkup(key) {
   const f = config.customFields[key];
@@ -410,9 +396,8 @@ $('confirmSave').onclick=async()=>{
     state.saved=true;$('reviewDialog').close();$('invoiceNumber').value=result.invoice.invoice_number || result.invoice.invoice_id;$('saveButton').disabled=true;$('saveButton').textContent='Saved to ERP ✓';
     notice(`Invoice ${result.invoice.invoice_number || result.invoice.invoice_id} saved in ERP (${result.invoice.status || 'created'}). Final total: ${money(Number(result.invoice.total))}.`,'success');
     $('invoiceForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);
-    await api.refreshInvoices();
     state.allowClose=true;
-    exitAfterSave();
+    exitAfterSave(result.invoice.invoice_id);
   }catch(e){if(e.apiRejected){$('saveStatus').textContent=e.message;$('confirmSave').disabled=false;}else{state.uncertain=true;$('saveButton').disabled=true;$('saveStatus').textContent='Could not confirm the result. Check the ERP invoice list before starting again to avoid a duplicate. '+e.message;}}finally{state.busy=false;}
 };
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('customerSearch').focus();}});

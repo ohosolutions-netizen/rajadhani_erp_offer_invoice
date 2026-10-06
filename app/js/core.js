@@ -52,6 +52,12 @@ export function itemPacking(item, fields = {}) {
   return {mu:mu || 'Unknown',pieces:null,packingError:'M Unit must be Set or Pieces. Map M Unit and Ratio to the item master fields.'};
 }
 export const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
+export function invoiceDetailUrl(organizationId, invoiceId) {
+  const org = encodeURIComponent(String(organizationId || ''));
+  const invoice = encodeURIComponent(String(invoiceId || ''));
+  if (!org || !invoice) return 'https://erp.zoho.in/app';
+  return `https://erp.zoho.in/app/${org}#/invoices/${invoice}?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D`;
+}
 export function taxPreference(preferences = [], intraState = true) {
   const value = tax => `${tax?.tax_name || tax?.tax_group_name || tax?.name || ''}`.toLowerCase();
   const specification = tax => String(tax?.tax_specification || '').toLowerCase();

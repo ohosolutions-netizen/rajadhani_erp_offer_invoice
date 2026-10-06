@@ -7,6 +7,10 @@ const lines=[{item_id:'1234567890123456789',quantity:2,rate:100,tax:{id:'t18',na
 const state={customer:{contact_id:'9876543210987654321',billing_address:{city:'Kochi'},shipping_address:{city:'Thrissur'}},lines};
 const config={invoiceQuantityMode:'pieces',customFields:{transport:{id:'cf1',label:'Transport',required:true}},requireSalesperson:true};
 const values={date:'2026-09-17',place_of_supply:'KL',salesperson_id:'s1',rounded:false,custom:{transport:'Own delivery'},notes:'Test'};
+test('invoice detail URL uses the active organization and created invoice IDs',()=>{
+ assert.equal(core.invoiceDetailUrl('60087827925','4160832000001031003'),'https://erp.zoho.in/app/60087827925#/invoices/4160832000001031003?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D');
+ assert.equal(core.invoiceDetailUrl('org/1','invoice 2'),'https://erp.zoho.in/app/org%2F1#/invoices/invoice%202?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D');
+});
 test('mixed tax rates and item percentage discounts before tax',()=>{const t=calculate(lines.map(l=>({...l,discount:10})));assert.equal(t.subtotal,250);assert.equal(t.discount,25);assert.equal(t.tax,34.65);assert.equal(t.total,259.65);});
 test('item discounts and whole-unit round off',()=>{const t=calculate(lines.map(l=>({...l,discount:10})),true);assert.equal(t.total,260);assert.equal(t.adjustment,.35);});
 test('zero subtotal remains finite',()=>assert.equal(calculate([],0).total,0));
