@@ -1,5 +1,5 @@
 import { ERP } from './erp.js';
-import { calculate, validateInvoice, makePayload, pieceQuantity, itemPacking, lineAmounts, taxPreference } from './core.js';
+import { calculate, validateInvoice, makePayload, pieceQuantity, itemPacking, lineAmounts, taxPreference, hasValidDiscount } from './core.js';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const config = await fetch(new URL('../config.json', import.meta.url)).then(r => { if (!r.ok) throw new Error('Cannot load widget configuration'); return r.json(); });
@@ -140,19 +140,31 @@ function focusInvoiceItems(focusIndex = null) {
     if (focusIndex != null) $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'});
   });
 }
+function focusDiscount(index, force=false) {
+  requestAnimationFrame(() => {
+    const active=document.activeElement;
+    const mayMove=active===document.body || (active===$('itemSearch') && !active.value) || active?.closest?.('#itemResults');
+    if (!force && !mayMove) return;
+    const discount=$(`lineItems`).querySelector(`[data-row="${index}"][data-field="discount"]`);
+    if (discount && !discount.disabled) discount.focus(); else $('itemSearch').focus();
+  });
+}
 function renderLines(focusIndex = null, focusItems = false) {
   $('emptyItems').hidden = !!state.lines.length;
-  $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="10"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><input type="number" min="0" max="100" step="any" value="${l.discount ?? 0}" data-row="${i}" data-field="discount" aria-label="Discount percent for ${esc(l.name)}" required ${l.loading ? 'disabled' : ''}></td><td class="right" data-discount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).discount))}</td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).taxable))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
+  $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="10"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><input type="number" min="0" max="100" step="any" value="${l.discount ? l.discount : ''}" data-row="${i}" data-field="discount" aria-label="Discount percent for ${esc(l.name)}" ${l.loading ? 'disabled' : ''}></td><td class="right" data-discount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).discount))}</td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}" disabled><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).taxable))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
   totals();
   if (!state.lines.length) loadPendingSO(null);
   if (focusIndex != null || focusItems) focusInvoiceItems(focusIndex);
 }
 $('lineItems').addEventListener('input', e => {
   const {row,field} = e.target.dataset; if (row == null || !field) return;
-  const l=state.lines[Number(row)]; if (!l || l.notFound) return; l[field] = field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
+  const l=state.lines[Number(row)]; if (!l || l.notFound) return; l[field] = field === 'discount' && e.target.value === '' ? undefined : field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
   document.querySelector(`[data-amount="${row}"]`).textContent = money(lineAmounts(l).taxable);
   document.querySelector(`[data-discount="${row}"]`).textContent = money(lineAmounts(l).discount);
   document.querySelector(`[data-piece="${row}"]`).textContent = l.pieces ? Math.round(l.pieces*l.quantity*1000)/1000 : '—'; totals();
+});
+$('lineItems').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.dataset.field === 'discount') { e.preventDefault(); $('itemSearch').focus(); }
 });
 $('lineItems').addEventListener('click', e => {
   const debug=e.target.closest('[data-debug]');
@@ -169,6 +181,7 @@ function address(a) { return a ? [a.attention,a.address,a.street2,[a.city,a.stat
 function addresses() {
   $('billingAddress').textContent=address(state.customer?.billing_address);
   $('shippingAddress').value=$('sameAsBilling').checked && state.customer ? address(state.customer.billing_address) : '';
+  $('shippingGst').value=$('sameAsBilling').checked ? $('gstNumber').value : (state.customer?.shipping_gst_no || '');
 }
 $('sameAsBilling').addEventListener('change', addresses);
 function selectOptions(id, records, idKey, nameKey, placeholder) { const current=$(id).value;$(id).replaceChildren(new Option(placeholder,''),...records.filter(r=>r.status!=='inactive'&&r.is_active!==false).map(r=>new Option(r[nameKey] || r.name || String(r[idKey]),String(r[idKey]))));if(records.some(r=>String(r[idKey])===current))$(id).value=current; }
@@ -305,7 +318,7 @@ async function fullItem(record) {
 async function lineFromItem(item, extra={}) {
   const tax = itemTax(item);
   const packing = itemPacking(item, config.itemFields);
-  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,discount:0,tax,taxPreferences:item.item_tax_preferences || [],tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
+  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,discount:undefined,tax,taxPreferences:item.item_tax_preferences || [],tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
 }
 function quickLineFromRecord(record) {
   return {item_id:String(record.item_id),name:record.name || record.item_name || record.sku || 'Scanned item',sku:record.sku || record.item_code,hsn_or_sac:record.hsn_or_sac,stock:record.available_stock ?? record.stock_on_hand,unit:record.unit,rate:Number(record.rate||0),quantity:1,tax:null,tax_exemption_id:record.tax_exemption_id,mu:record.unit || '',pieces:null,loading:true};
@@ -317,7 +330,7 @@ async function addItem(record, options={}) {
   if(!state.customer)throw new Error('Select a customer before adding items.');
   let placeholder=options.placeholder || null;
   const existingIndex=state.lines.findIndex(l=>String(l.item_id)===String(record.item_id)&&!l.salesorder_item_id&&!l.loading);
-  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex,true);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
+  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex,true);loadPendingSO(state.lines[existingIndex]);focusDiscount(existingIndex);return;}
   const version=state.customerVersion;
   if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index,true);$('itemSearch').focus();}}
   else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1,true);$('itemSearch').focus();}
@@ -326,9 +339,9 @@ async function addItem(record, options={}) {
     const line=await lineFromItem(item);if(line.tracked)throw new Error('This item requires batch, serial or storage allocation. Please use the native ERP invoice editor.');
     const loadingIndex=placeholder ? state.lines.indexOf(placeholder) : -1;
     const duplicateIndex=state.lines.findIndex((l,i)=>i!==loadingIndex&&String(l.item_id)===line.item_id&&!l.salesorder_item_id&&!l.loading);
-    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex,true);loadPendingSO(state.lines[duplicateIndex]);}
-    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex,true);loadPendingSO(state.lines[loadingIndex]);}
-    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex,true);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
+    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex,true);loadPendingSO(state.lines[duplicateIndex]);focusDiscount(duplicateIndex);}
+    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex,true);loadPendingSO(state.lines[loadingIndex]);focusDiscount(loadingIndex);}
+    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex,true);loadPendingSO(state.lines[targetIndex]);focusDiscount(targetIndex);}
   }catch(e){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}}throw e;}finally{pending(-1);}
 }
 async function scanItemText(text) {
@@ -385,7 +398,7 @@ for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.datas
 $('invoiceForm').addEventListener('submit',e=>{
   e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
   if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
-  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');return;}
+  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');const index=state.lines.findIndex(l=>!l.notFound&&!hasValidDiscount(l));if(index>=0)focusDiscount(index,true);else if(v.shipping_gst_no && v.shipping_gst_no.length!==15)$('shippingGst').focus();return;}
   approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.rounded,v.place_of_supply === (config.organizationStateCode || 'KL'));
   $('reviewContent').innerHTML=`<div class="summaryrow"><span>Customer</span><strong>${esc(state.customer.contact_name)}</strong></div><div class="summaryrow"><span>Invoice date</span><strong>${esc(v.date)}</strong></div>${state.lines.map(l=>`<div class="summaryrow"><span>${esc(l.name)} · ${l.quantity} × ${l.pieces ?? "?"} = ${l.pieces ? pieceQuantity(l) : "?"} pieces · ${l.discount ?? 0}% discount (${esc(money(lineAmounts(l).discount))})</span><strong>${esc(money(lineAmounts(l).taxable))}</strong></div>`).join('')}<div class="summaryrow"><span>Total Discount Amount</span><strong>${esc(money(t.discount))}</strong></div><div class="grandtotal"><span>Estimated offer invoice total</span><strong>${esc(money(t.total))}</strong></div><p>This creates a draft invoice. It does not email the customer. ERP will calculate the final total.</p>`;
   $('saveStatus').textContent='';$('confirmSave').disabled=!!window.RAJADHANI_PREVIEW_CONFIG;if(window.RAJADHANI_PREVIEW_CONFIG)$('saveStatus').textContent='Preview only. No records will be created.';$('reviewDialog').showModal();

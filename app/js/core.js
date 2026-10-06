@@ -68,6 +68,10 @@ export function lineAmounts(line) {
   const discount = round(gross * (line.discount ?? 0) / 100);
   return { gross, discount, taxable: round(gross - discount) };
 }
+export function hasValidDiscount(line) {
+  const discount = line.discount;
+  return Number.isFinite(discount) && discount > 0 && discount <= 100;
+}
 export function calculate(lines, rounded = false, intraState = false) {
   const invoiceLines = lines.filter(l => !l.notFound);
   const subtotal = round(invoiceLines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
@@ -92,6 +96,7 @@ export function validateInvoice(state, values, config) {
   if (!state.customer) errors.push('Select a customer from the ERP search results.');
   if (!values.date) errors.push('Choose an invoice date.');
   if (!/^[A-Z]{2}$/.test(values.place_of_supply)) errors.push('Enter a valid two-letter place-of-supply state code.');
+  if (values.shipping_gst_no && values.shipping_gst_no.length !== 15) errors.push('Shipping GSTIN must contain exactly 15 characters, or be left blank.');
   const invoiceLines = state.lines.filter(l => !l.notFound);
   if (!invoiceLines.length) errors.push('Add at least one item.');
   if (state.lines.some(l => l.notFound)) errors.push('Remove or correct scanned items marked Item not found.');
@@ -99,7 +104,7 @@ export function validateInvoice(state, values, config) {
   if (config.requireLocation && !values.location_id) errors.push('Select a business location.');
   if (!['pieces','order'].includes(config.invoiceQuantityMode)) errors.push('Confirm how order quantity and P. quantity should be saved to ERP before saving.');
   invoiceLines.forEach((line, index) => {
-    if (!Number.isFinite(line.discount ?? 0) || (line.discount ?? 0) < 0 || (line.discount ?? 0) > 100) errors.push(`Item ${index + 1}: enter a discount percentage from 0 to 100.`);
+    if (!hasValidDiscount(line)) errors.push(`Item ${index + 1}${line.name ? ` (${line.name})` : ''}: enter a discount percentage greater than 0 and up to 100.`);
     if (line.packingError) errors.push(`Item ${index + 1}: ${line.packingError}`);
     if (!Number.isFinite(line.quantity) || line.quantity <= 0 || !Number.isFinite(line.rate) || line.rate < 0) errors.push(`Item ${index + 1}: enter a positive quantity and a non-negative rate.`);
     if (!line.tax && !line.tax_exemption_id) errors.push(`Item ${index + 1}: choose an ERP tax or use an item with a configured exemption.`);

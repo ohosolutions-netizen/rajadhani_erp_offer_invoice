@@ -25,6 +25,12 @@ test('not found scan rows are ignored in totals and block save until removed',()
 });
 test('reject invalid quantities and excessive discounts while allowing unmapped custom fields',()=>{const errors=validateInvoice({...state,lines:[{...lines[0],quantity:0,discount:110}]},{...values,discount:110},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(errors.some(e=>e.includes('quantity')));assert.ok(errors.some(e=>e.includes('discount')));assert.ok(!errors.some(e=>e.includes('custom-field ID')));});
 test('required custom fields are enforced even before their ERP field is mapped',()=>{const errors=validateInvoice(state,{...values,custom:{transport:''}},config);assert.ok(errors.some(e=>e.includes('Transport is required')));const unmapped=validateInvoice(state,{...values,custom:{transport:''}},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(unmapped.some(e=>e.includes('Transport is required')));});
+test('shipping GSTIN is optional but must contain exactly 15 characters when entered',()=>{
+ const validState={...state,lines:[{...lines[0],discount:5}]};
+ assert.ok(validateInvoice(validState,{...values,shipping_gst_no:'123'},config).some(e=>e.includes('exactly 15 characters')));
+ assert.ok(!validateInvoice(validState,{...values,shipping_gst_no:''},config).some(e=>e.includes('Shipping GSTIN')));
+ assert.ok(!validateInvoice(validState,{...values,shipping_gst_no:'32ABCDE1234F1Z5'},config).some(e=>e.includes('Shipping GSTIN')));
+});
 test('payload preserves IDs, mappings, tax IDs and links without sending email',()=>{const p=makePayload(state,{...values,shipping_address:'Manual shipping'},config);assert.equal(p.customer_id,'9876543210987654321');assert.equal(p.line_items[0].item_id,'1234567890123456789');assert.equal(p.line_items[0].tax_id,'t18');assert.equal(p.discount,undefined);assert.equal(p.discount_type,'item_level');assert.equal(p.is_discount_before_tax,true);assert.equal(p.line_items[0].discount,'0%');assert.deepEqual(p.custom_fields,[{customfield_id:'cf1',value:'Own delivery'}]);assert.deepEqual(p.shipping_address,{address:'Manual shipping'});assert.equal(p.send,undefined);});
 test('interstate payload uses the item IGST preference',()=>{
  const line={...lines[0],taxPreferences:[
@@ -122,15 +128,15 @@ test('different item discounts reduce only their own taxable base',()=>{
  const p=makePayload({...state,lines:discounted},values,config);
  assert.deepEqual(p.line_items.map(l=>l.discount),['10%','20%']);
 });
-test('discount boundaries, rounding, exemptions and invalid percentages',()=>{
+test('discount is mandatory and must be greater than zero',()=>{
  assert.equal(calculate([{...lines[0],discount:100}]).total,0);
  assert.equal(calculate(lines).discount,0);
  assert.deepEqual(core.lineAmounts({quantity:3,pieces:2,rate:1.11,discount:12.5}),{gross:6.66,discount:0.83,taxable:5.83});
  assert.equal(calculate([{...lines[0],tax:null,discount:50}]).total,100);
- for(const discount of [-1,100.1,NaN,Infinity,'10%']) {
+ for(const discount of [undefined,0,-1,100.1,NaN,Infinity,'10%']) {
   assert.ok(validateInvoice({...state,lines:[{...lines[0],discount}]},values,config).some(e=>e.includes('discount percentage')));
  }
- for(const discount of [0,12.5,100]) {
+ for(const discount of [0.01,12.5,100]) {
   assert.deepEqual(validateInvoice({...state,lines:[{...lines[0],discount}]},values,config),[]);
  }
 });

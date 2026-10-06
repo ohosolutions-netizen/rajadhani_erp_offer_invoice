@@ -16,6 +16,32 @@ test('section headers use the orange theme with white text',async({page})=>{
  }));
  expect(colors).toEqual({background:'rgb(215, 91, 50)',heading:'rgb(255, 255, 255)',badge:'rgb(255, 255, 255)',badgeBackground:'rgba(0, 0, 0, 0)'});
 });
+test('scan workflow requires discount, locks tax, and returns Enter to item search',async({page})=>{
+ await start(page);await customer(page);await scanItem(page,'PAP-A4-75');
+ const first=page.locator('[data-field=discount]').first();
+ await expect(first).toBeEnabled();await expect(first).toHaveValue('');await expect(first).toBeFocused();
+ await expect(page.locator('[data-field=tax]').first()).toBeDisabled();
+ await first.fill('10');await first.press('Enter');await expect(page.locator('#itemSearch')).toBeFocused();
+ await scanItem(page,'NB-SP-200');
+ const second=page.locator('[data-field=discount]').nth(1);
+ await expect(second).toBeEnabled();await expect(second).toHaveValue('');await expect(second).toBeFocused();
+ await required(page);await page.locator('#saveButton').click();
+ await expect(page.locator('#notice')).toContainText('Spiral Notebook');await expect(second).toBeFocused();
+});
+test('same as billing copies GSTIN and validates manually entered shipping GSTIN',async({page})=>{
+ await start(page);await customer(page);
+ await page.locator('#sameAsBilling').check();await expect(page.locator('#shippingGst')).toHaveValue('32ABCDE1234F1Z5');
+ await scanItem(page,'PAP-A4-75');await page.locator('[data-field=discount]').fill('5');await required(page);
+ await page.locator('#shippingGst').fill('ABC');await page.locator('#saveButton').click();
+ await expect(page.locator('#notice')).toContainText('exactly 15 characters');await expect(page.locator('#shippingGst')).toBeFocused();
+ await page.locator('#shippingGst').fill('');await page.locator('#saveButton').click();await expect(page.locator('#reviewDialog')).toBeVisible();
+});
+test('second row has four equal fields and removed controls stay hidden',async({page})=>{
+ await start(page);
+ await expect(page.locator('#browseItems')).toBeHidden();await expect(page.locator('#location')).toBeHidden();
+ const widths=await page.locator('.fourfields > .field').evaluateAll(fields=>fields.map(field=>Math.round(field.getBoundingClientRect().width)));
+ expect(widths).toHaveLength(4);expect(Math.max(...widths)-Math.min(...widths)).toBeLessThanOrEqual(1);
+});
 test('sales order import and customer switch preserve existing item behavior',async({page})=>{await start(page);await customer(page);await page.locator('#salesOrder').selectOption('so1');await expect(page.locator('#lineCount')).toHaveText('2');await expect(page.locator('#grandTotal')).toHaveText('₹53,854.00');await page.locator('#customerSearch').fill('Sree');await expect(page.locator('#lineCount')).toHaveText('2');await expect(page.locator('#gstNumber')).toHaveValue('');await page.getByRole('option').filter({hasText:'Sree Krishna'}).click();await expect(page.locator('#billingAddress')).toContainText('Thrissur');});
 test('standalone file works without HTTP server and mobile does not overflow',async({page})=>{await page.goto('file://'+process.cwd()+'/dist/InvoicePreview.html');await expect(page.locator('#connectionStatus')).toHaveText('Preview · sample data');await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'dist/MobilePreview.png',fullPage:true});});
 test('capture filled desktop preview',async({page})=>{await start(page);await customer(page);await page.locator('#salesOrder').selectOption('so1');await expect(page.locator('#lineCount')).toHaveText('2');await required(page);await page.locator('#cf_agent').selectOption('Direct');await page.locator('#cf_vehicle').selectOption('KL 01 AB 2345');await page.locator('[data-field=discount]').first().fill('5');await page.locator('#notice').evaluate(e=>e.hidden=true);await page.screenshot({path:'dist/InvoicePreview.png',fullPage:true});});
@@ -94,11 +120,11 @@ test('no Start over and odd-paise GST components round before invoice total',asy
  const row=page.locator('#lineItems tr').first();
  await expect(row.locator('[data-field=discount]')).toBeEnabled();
  await row.locator('[data-field=quantity]').fill('1');
- await row.locator('[data-field=rate]').fill('220.5');
- await row.locator('[data-field=tax]').selectOption({label:'GST 5 (5%)'});
- await expect(page.locator('#taxBreakdown')).toContainText('CGST₹55.13');
- await expect(page.locator('#taxBreakdown')).toContainText('SGST₹55.13');
- await expect(page.locator('#taxTotal')).toHaveText('₹110.26');
- await expect(page.locator('#roundValue')).toHaveText('-₹0.26');
- await expect(page.locator('#grandTotal')).toHaveText('₹2,315.00');
+ await row.locator('[data-field=rate]').fill('220.425');
+ await expect(row.locator('[data-field=tax]')).toBeDisabled();
+ await expect(page.locator('#taxBreakdown')).toContainText('CGST₹132.26');
+ await expect(page.locator('#taxBreakdown')).toContainText('SGST₹132.26');
+ await expect(page.locator('#taxTotal')).toHaveText('₹264.52');
+ await expect(page.locator('#roundValue')).toHaveText('₹0.23');
+ await expect(page.locator('#grandTotal')).toHaveText('₹2,469.00');
 });

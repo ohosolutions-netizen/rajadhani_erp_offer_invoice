@@ -47,7 +47,7 @@ form,.workspace{height:100%;min-height:0}
 .card{border-radius:5px;box-shadow:none}
 .sectionheading{min-height:28px;padding:5px 8px;background:var(--orange);border-bottom-color:var(--orange);color:#fff}
 .sectionheading h2{font-size:12px;color:#fff}.sectionheading .currency,.sectionheading .subtle{color:#fff}.sectionheading .step,.sectionheading .count{background:transparent;border:1px solid #ffffff80;color:#fff}.step{width:18px;height:18px;border-radius:4px;font-size:9px}.subtle{display:none}
-.cardbody{padding:7px 8px}.grid{gap:6px;margin-bottom:6px}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.twofields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cardbody{padding:7px 8px}.grid{gap:6px;margin-bottom:6px}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.twofields{grid-template-columns:repeat(2,minmax(0,1fr))}.fourfields{grid-template-columns:repeat(4,minmax(0,1fr))}
 .customergrid{grid-template-columns:1.7fr .75fr .9fr}.customergrid .searchfield{grid-column:auto}
 input,select,textarea{min-height:25px;border-radius:3px;padding:3px 6px;font-size:11px}
 .searchbox{height:25px;border-radius:3px;padding:0 6px}.searchbox>span{font-size:16px}.searchbox input{min-height:23px}
@@ -152,11 +152,11 @@ dialog{border-radius:7px}
 <div id="notice" class="notice" role="status" hidden><span id="noticeText"></span><button type="button" id="noticeClose" class="noticeclose" aria-label="Close warning">×</button></div>
 <form id="invoiceForm"><div class="workspace"><div class="maincolumn">
 <section class="card"><div class="sectionheading"><div><span class="step">01</span><h2>Customer & offer invoice</h2></div><span class="subtle">Start with who you’re billing</span></div><div class="cardbody"><div class="grid customergrid"><div class="field searchfield"><label for="customerSearch">Customer <em>*</em></label><div class="searchbox"><span>⌕</span><input id="customerSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="customerResults" placeholder="Search customers by name…" required><kbd>⌘ K</kbd></div><div id="customerResults" class="results" role="listbox" hidden></div><small id="customerHint">Search your ERP customer directory</small></div><div class="field"><label for="invoiceDate">Invoice date <em>*</em></label><input id="invoiceDate" type="date" required></div><div class="field"><label for="invoiceNumber">Invoice number</label><input id="invoiceNumber" readonly placeholder="Assigned by ERP" class="mutedinput"></div></div>
-<div class="grid twofields"><div class="field"><label for="salesOrder">Sales order</label><select id="salesOrder" disabled><option value="">Select a customer first</option></select></div><div class="field"><label for="salesperson">Salesperson <em>*</em></label><select id="salesperson"><option value="">Select salesperson</option></select></div></div>
-<div class="grid three"><div class="field"><label for="location">Business location</label><select id="location"><option value="">Organization default</option></select></div><div class="field"><label for="placeOfSupply">Place of supply <em>*</em></label><input id="placeOfSupply" maxlength="2" placeholder="State code from ERP, e.g. KL" required></div><div class="field"><label for="gstNumber">Customer GSTIN</label><input id="gstNumber" readonly placeholder="From customer" class="mutedinput"></div></div>
-<div class="addressgrid"><div class="addresscard"><div class="addressheading"><h3>Billing address</h3><span class="tinybadge">ERP RECORD</span></div><p id="billingAddress" class="address">Select a customer to load their billing address.</p></div><div class="addresscard"><div class="addressheading"><h3>Shipping address</h3><label class="check"><input type="checkbox" id="sameAsBilling"> Same as billing</label></div><textarea id="shippingAddress" class="address editaddress" rows="3" placeholder="Tick Same as billing to copy billing address, or enter shipping address manually."></textarea><div class="field compact"><label for="shippingGst">Shipping GSTIN</label><input id="shippingGst" placeholder="From customer"></div></div></div>
+<div class="grid fourfields"><div class="field"><label for="salesOrder">Sales order</label><select id="salesOrder" disabled><option value="">Select a customer first</option></select></div><div class="field"><label for="gstNumber">Customer GSTIN</label><input id="gstNumber" readonly placeholder="From customer" class="mutedinput"></div><div class="field"><label for="placeOfSupply">Place of supply <em>*</em></label><input id="placeOfSupply" maxlength="2" placeholder="State code, e.g. KL" required></div><div class="field"><label for="salesperson">Salesperson <em>*</em></label><select id="salesperson"><option value="">Select salesperson</option></select></div></div>
+<div hidden><select id="location"><option value="">Organization default</option></select></div>
+<div class="addressgrid"><div class="addresscard"><div class="addressheading"><h3>Billing address</h3><span class="tinybadge">ERP RECORD</span></div><p id="billingAddress" class="address">Select a customer to load their billing address.</p></div><div class="addresscard"><div class="addressheading"><h3>Shipping address</h3><label class="check"><input type="checkbox" id="sameAsBilling"> Same as billing</label></div><textarea id="shippingAddress" class="address editaddress" rows="3" placeholder="Tick Same as billing to copy billing address, or enter shipping address manually."></textarea><div class="field compact"><label for="shippingGst">Shipping GSTIN</label><input id="shippingGst" maxlength="15" placeholder="15-character GSTIN"></div></div></div>
 <details class="more" open><summary>Contact & billing details <span>Required business fields</span></summary><div class="grid three" id="billingFields"></div></details></div></section>
-<section class="card itemsCard" id="invoiceItemsCard"><div class="sectionheading"><div><span class="step">02</span><h2>Offer Invoice items</h2><span id="lineCount" class="count">0</span></div><span class="subtle">Prices & stock from ERP</span></div><div class="cardbody"><div class="itemsearchrow"><div class="searchfield grow"><label class="sr-only" for="itemSearch">Search items</label><div class="searchbox"><span>⌕</span><input id="itemSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="itemResults" placeholder="Search an item, SKU or scan a barcode…"><kbd>↵</kbd></div><div id="itemResults" class="results" role="listbox" hidden></div></div><button type="button" class="button" id="browseItems">＋ Browse items</button></div></div>
+<section class="card itemsCard" id="invoiceItemsCard"><div class="sectionheading"><div><span class="step">02</span><h2>Offer Invoice items</h2><span id="lineCount" class="count">0</span></div><span class="subtle">Prices & stock from ERP</span></div><div class="cardbody"><div class="itemsearchrow"><div class="searchfield grow"><label class="sr-only" for="itemSearch">Search items</label><div class="searchbox"><span>⌕</span><input id="itemSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="itemResults" placeholder="Search an item, SKU or scan a barcode…"><kbd>↵</kbd></div><div id="itemResults" class="results" role="listbox" hidden></div></div><button type="button" class="button" id="browseItems" hidden>＋ Browse items</button></div></div>
 <div class="tablewrap"><table><thead><tr><th>#</th><th class="itemname">Item details</th><th>Stock / UoM</th><th>Pieces / pack</th><th>Order qty</th><th>P. qty</th><th>Rate / piece</th><th>Discount %</th><th class="right">Discount Amount</th><th>Tax</th><th class="right">Net Amount</th><th></th></tr></thead><tbody id="lineItems"></tbody></table><div id="emptyItems" class="empty"><div class="emptyicon">▧</div><h3>Your invoice starts here</h3><p>Find an item above to add it to this invoice.</p><span>Search by name or SKU · Barcode scanner ready</span></div></div><div class="tablefooter"><span id="qtySummary">0 items · 0 total quantity</span><span>Net amount = P. qty × rate − item discount · Tax exclusive</span></div></section>
 </div><aside><section class="card summary"><div class="sectionheading"><h2>Subtotals & delivery</h2><span class="currency" id="currencyLabel">INR</span></div><div class="cardbody"><div class="sideblocktitle">Transporter information</div><div class="grid twoslim" id="dispatchFields"></div><div class="field remarks"><label for="notes">Remarks</label><textarea id="notes" rows="2" placeholder="Delivery instructions or invoice note"></textarea></div><div class="sideblocktitle summarytitle">Summary information</div><div class="summarygrid"><div class="summaryrow"><span>Total</span><strong id="subtotal">₹0.00</strong></div><div class="summaryrow"><span>Total Discount Amount</span><span class="green" id="discountAmount">− ₹0.00</span></div><div class="summaryrow"><span>Tax Amount</span><span id="taxTotal">₹0.00</span></div><div id="taxBreakdown"></div><div class="summaryrow"><span>Round off</span><span id="roundValue">₹0.00</span></div><div class="summaryrow billamount"><span>Bill Amount</span><strong id="grandTotal">₹0.00</strong></div></div><small id="totalDetail" class="totaldetail">0 items in this invoice</small><button class="button primary full" id="saveButton" type="submit">Submit offer invoice <span>→</span></button></div></section></aside></div></form><footer><span id="footerStatus">Zoho ERP widget</span></footer></main>
 <dialog id="reviewDialog"><div class="dialogheading"><div><div class="eyebrow">READY FOR A QUICK CHECK</div><h2>Review your invoice</h2></div><button type="button" class="iconbutton" data-close="reviewDialog" aria-label="Close review">×</button></div><div id="reviewContent"></div><div class="dialogactions"><button type="button" class="button" data-close="reviewDialog">Back to editing</button><button type="button" class="button primary" id="confirmSave">Save draft to ERP →</button></div><p id="saveStatus" role="status"></p></dialog>
@@ -284,6 +284,10 @@ function lineAmounts(line) {
   const discount = round(gross * (line.discount ?? 0) / 100);
   return { gross, discount, taxable: round(gross - discount) };
 }
+function hasValidDiscount(line) {
+  const discount = line.discount;
+  return Number.isFinite(discount) && discount > 0 && discount <= 100;
+}
 function calculate(lines, rounded = false, intraState = false) {
   const invoiceLines = lines.filter(l => !l.notFound);
   const subtotal = round(invoiceLines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
@@ -308,6 +312,7 @@ function validateInvoice(state, values, config) {
   if (!state.customer) errors.push('Select a customer from the ERP search results.');
   if (!values.date) errors.push('Choose an invoice date.');
   if (!/^[A-Z]{2}$/.test(values.place_of_supply)) errors.push('Enter a valid two-letter place-of-supply state code.');
+  if (values.shipping_gst_no && values.shipping_gst_no.length !== 15) errors.push('Shipping GSTIN must contain exactly 15 characters, or be left blank.');
   const invoiceLines = state.lines.filter(l => !l.notFound);
   if (!invoiceLines.length) errors.push('Add at least one item.');
   if (state.lines.some(l => l.notFound)) errors.push('Remove or correct scanned items marked Item not found.');
@@ -315,7 +320,7 @@ function validateInvoice(state, values, config) {
   if (config.requireLocation && !values.location_id) errors.push('Select a business location.');
   if (!['pieces','order'].includes(config.invoiceQuantityMode)) errors.push('Confirm how order quantity and P. quantity should be saved to ERP before saving.');
   invoiceLines.forEach((line, index) => {
-    if (!Number.isFinite(line.discount ?? 0) || (line.discount ?? 0) < 0 || (line.discount ?? 0) > 100) errors.push(`Item ${index + 1}: enter a discount percentage from 0 to 100.`);
+    if (!hasValidDiscount(line)) errors.push(`Item ${index + 1}${line.name ? ` (${line.name})` : ''}: enter a discount percentage greater than 0 and up to 100.`);
     if (line.packingError) errors.push(`Item ${index + 1}: ${line.packingError}`);
     if (!Number.isFinite(line.quantity) || line.quantity <= 0 || !Number.isFinite(line.rate) || line.rate < 0) errors.push(`Item ${index + 1}: enter a positive quantity and a non-negative rate.`);
     if (!line.tax && !line.tax_exemption_id) errors.push(`Item ${index + 1}: choose an ERP tax or use an item with a configured exemption.`);
@@ -604,19 +609,31 @@ function focusInvoiceItems(focusIndex = null) {
     if (focusIndex != null) $('lineItems').children[focusIndex]?.scrollIntoView({block:'nearest'});
   });
 }
+function focusDiscount(index, force=false) {
+  requestAnimationFrame(() => {
+    const active=document.activeElement;
+    const mayMove=active===document.body || (active===$('itemSearch') && !active.value) || active?.closest?.('#itemResults');
+    if (!force && !mayMove) return;
+    const discount=$(`lineItems`).querySelector(`[data-row="${index}"][data-field="discount"]`);
+    if (discount && !discount.disabled) discount.focus(); else $('itemSearch').focus();
+  });
+}
 function renderLines(focusIndex = null, focusItems = false) {
   $('emptyItems').hidden = !!state.lines.length;
-  $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="10"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><input type="number" min="0" max="100" step="any" value="${l.discount ?? 0}" data-row="${i}" data-field="discount" aria-label="Discount percent for ${esc(l.name)}" required ${l.loading ? 'disabled' : ''}></td><td class="right" data-discount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).discount))}</td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}"><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).taxable))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
+  $('lineItems').innerHTML = state.lines.map((l,i) => l.notFound ? `<tr data-line="${i}" class="notfoundline"><td>${i+1}</td><td colspan="10"><strong>Item not found</strong><small>Scanned value: ${esc(l.scanText || l.sku || '')}. Check the barcode/item code in ERP.</small></td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove item not found warning">×</button></td></tr>` : `<tr data-line="${i}" class="${l.loading ? 'loadingline' : ''}"><td>${i+1}</td><td class="itemname"><strong>${esc(l.name)}</strong><small>${esc(l.sku || 'No SKU')} · HSN ${esc(l.hsn_or_sac || '—')}</small>${l.loading ? '<small class="loadingnote">Loading ERP item details…</small>' : ''}${l.packingError ? `<small class="packingerror">${esc(l.packingError)}</small>${l.itemDebug ? `<button class="debugcopy" type="button" data-debug="${i}">Copy item response</button>` : ''}` : ''}</td><td>${esc(l.stock ?? '—')}<small>${esc(l.mu || l.unit || 'units')}</small></td><td>${l.loading ? '…' : esc(l.pieces || '—')}</td><td><input type="number" min="0.001" step="any" value="${l.quantity}" data-row="${i}" data-field="quantity" aria-label="Quantity for ${esc(l.name)}" required></td><td data-piece="${i}">${l.loading ? '…' : l.pieces ? l.pieces*l.quantity : '—'}</td><td><input type="number" min="0" step="0.01" value="${l.rate}" data-row="${i}" data-field="rate" aria-label="Rate for ${esc(l.name)}" required></td><td><input type="number" min="0" max="100" step="any" value="${l.discount ? l.discount : ''}" data-row="${i}" data-field="discount" aria-label="Discount percent for ${esc(l.name)}" ${l.loading ? 'disabled' : ''}></td><td class="right" data-discount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).discount))}</td><td><select data-row="${i}" data-field="tax" aria-label="Tax for ${esc(l.name)}" disabled><option value="">${l.loading ? 'Loading…' : l.tax_exemption_id ? 'ERP exempt' : 'Select tax'}</option>${state.taxes.map(t=>`<option value="${esc(t.id)}" ${String(l.tax?.id)===String(t.id)?'selected':''}>${esc(t.name)} (${t.percentage}%)</option>`).join('')}</select></td><td class="right" data-amount="${i}">${l.loading ? '…' : esc(money(lineAmounts(l).taxable))}</td><td><button class="remove" type="button" data-remove="${i}" aria-label="Remove ${esc(l.name)}">×</button></td></tr>`).join('');
   totals();
   if (!state.lines.length) loadPendingSO(null);
   if (focusIndex != null || focusItems) focusInvoiceItems(focusIndex);
 }
 $('lineItems').addEventListener('input', e => {
   const {row,field} = e.target.dataset; if (row == null || !field) return;
-  const l=state.lines[Number(row)]; if (!l || l.notFound) return; l[field] = field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
+  const l=state.lines[Number(row)]; if (!l || l.notFound) return; l[field] = field === 'discount' && e.target.value === '' ? undefined : field === 'tax' ? state.taxes.find(t=>String(t.id) === e.target.value) : Number(e.target.value);
   document.querySelector(`[data-amount="${row}"]`).textContent = money(lineAmounts(l).taxable);
   document.querySelector(`[data-discount="${row}"]`).textContent = money(lineAmounts(l).discount);
   document.querySelector(`[data-piece="${row}"]`).textContent = l.pieces ? Math.round(l.pieces*l.quantity*1000)/1000 : '—'; totals();
+});
+$('lineItems').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.dataset.field === 'discount') { e.preventDefault(); $('itemSearch').focus(); }
 });
 $('lineItems').addEventListener('click', e => {
   const debug=e.target.closest('[data-debug]');
@@ -633,6 +650,7 @@ function address(a) { return a ? [a.attention,a.address,a.street2,[a.city,a.stat
 function addresses() {
   $('billingAddress').textContent=address(state.customer?.billing_address);
   $('shippingAddress').value=$('sameAsBilling').checked && state.customer ? address(state.customer.billing_address) : '';
+  $('shippingGst').value=$('sameAsBilling').checked ? $('gstNumber').value : (state.customer?.shipping_gst_no || '');
 }
 $('sameAsBilling').addEventListener('change', addresses);
 function selectOptions(id, records, idKey, nameKey, placeholder) { const current=$(id).value;$(id).replaceChildren(new Option(placeholder,''),...records.filter(r=>r.status!=='inactive'&&r.is_active!==false).map(r=>new Option(r[nameKey] || r.name || String(r[idKey]),String(r[idKey]))));if(records.some(r=>String(r[idKey])===current))$(id).value=current; }
@@ -769,7 +787,7 @@ async function fullItem(record) {
 async function lineFromItem(item, extra={}) {
   const tax = itemTax(item);
   const packing = itemPacking(item, config.itemFields);
-  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,discount:0,tax,taxPreferences:item.item_tax_preferences || [],tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
+  return {item_id:String(item.item_id),name:item.name,sku:item.sku,hsn_or_sac:item.hsn_or_sac,stock:item.available_stock ?? item.stock_on_hand,unit:item.unit,rate:Number(item.rate||0),quantity:1,discount:undefined,tax,taxPreferences:item.item_tax_preferences || [],tax_exemption_id:item.tax_exemption_id,...packing,itemDebug:item.__rajadhaniDebug,tracked:!!(item.is_serial_number_tracking_enabled||item.is_batch_tracking_enabled||item.is_storage_location_enabled),...extra};
 }
 function quickLineFromRecord(record) {
   return {item_id:String(record.item_id),name:record.name || record.item_name || record.sku || 'Scanned item',sku:record.sku || record.item_code,hsn_or_sac:record.hsn_or_sac,stock:record.available_stock ?? record.stock_on_hand,unit:record.unit,rate:Number(record.rate||0),quantity:1,tax:null,tax_exemption_id:record.tax_exemption_id,mu:record.unit || '',pieces:null,loading:true};
@@ -781,7 +799,7 @@ async function addItem(record, options={}) {
   if(!state.customer)throw new Error('Select a customer before adding items.');
   let placeholder=options.placeholder || null;
   const existingIndex=state.lines.findIndex(l=>String(l.item_id)===String(record.item_id)&&!l.salesorder_item_id&&!l.loading);
-  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex,true);loadPendingSO(state.lines[existingIndex]);$('itemSearch').focus();return;}
+  if(existingIndex>=0){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0)state.lines.splice(index,1);}state.lines[existingIndex].quantity++;$('itemSearch').value='';renderLines(existingIndex,true);loadPendingSO(state.lines[existingIndex]);focusDiscount(existingIndex);return;}
   const version=state.customerVersion;
   if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines[index]={...quickLineFromRecord(record),quantity:placeholder.quantity || 1};placeholder=state.lines[index];renderLines(index,true);$('itemSearch').focus();}}
   else if(options.fast){placeholder=quickLineFromRecord(record);state.lines.push(placeholder);$('itemSearch').value='';renderLines(state.lines.length-1,true);$('itemSearch').focus();}
@@ -790,9 +808,9 @@ async function addItem(record, options={}) {
     const line=await lineFromItem(item);if(line.tracked)throw new Error('This item requires batch, serial or storage allocation. Please use the native ERP invoice editor.');
     const loadingIndex=placeholder ? state.lines.indexOf(placeholder) : -1;
     const duplicateIndex=state.lines.findIndex((l,i)=>i!==loadingIndex&&String(l.item_id)===line.item_id&&!l.salesorder_item_id&&!l.loading);
-    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex,true);loadPendingSO(state.lines[duplicateIndex]);}
-    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex,true);loadPendingSO(state.lines[loadingIndex]);}
-    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex,true);loadPendingSO(state.lines[targetIndex]);$('itemSearch').focus();}
+    if(duplicateIndex>=0){state.lines[duplicateIndex].quantity += placeholder?.quantity || 1;if(loadingIndex>=0)state.lines.splice(loadingIndex,1);renderLines(duplicateIndex,true);loadPendingSO(state.lines[duplicateIndex]);focusDiscount(duplicateIndex);}
+    else if(loadingIndex>=0){state.lines[loadingIndex]={...line,quantity:placeholder.quantity};renderLines(loadingIndex,true);loadPendingSO(state.lines[loadingIndex]);focusDiscount(loadingIndex);}
+    else {state.lines.push(line);const targetIndex=state.lines.length-1;$('itemSearch').value='';renderLines(targetIndex,true);loadPendingSO(state.lines[targetIndex]);focusDiscount(targetIndex);}
   }catch(e){if(placeholder){const index=state.lines.indexOf(placeholder);if(index>=0){state.lines.splice(index,1);renderLines();}}throw e;}finally{pending(-1);}
 }
 async function scanItemText(text) {
@@ -849,7 +867,7 @@ for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.datas
 $('invoiceForm').addEventListener('submit',e=>{
   e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
   if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
-  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');return;}
+  const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');const index=state.lines.findIndex(l=>!l.notFound&&!hasValidDiscount(l));if(index>=0)focusDiscount(index,true);else if(v.shipping_gst_no && v.shipping_gst_no.length!==15)$('shippingGst').focus();return;}
   approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.rounded,v.place_of_supply === (config.organizationStateCode || 'KL'));
   $('reviewContent').innerHTML=`<div class="summaryrow"><span>Customer</span><strong>${esc(state.customer.contact_name)}</strong></div><div class="summaryrow"><span>Invoice date</span><strong>${esc(v.date)}</strong></div>${state.lines.map(l=>`<div class="summaryrow"><span>${esc(l.name)} · ${l.quantity} × ${l.pieces ?? "?"} = ${l.pieces ? pieceQuantity(l) : "?"} pieces · ${l.discount ?? 0}% discount (${esc(money(lineAmounts(l).discount))})</span><strong>${esc(money(lineAmounts(l).taxable))}</strong></div>`).join('')}<div class="summaryrow"><span>Total Discount Amount</span><strong>${esc(money(t.discount))}</strong></div><div class="grandtotal"><span>Estimated offer invoice total</span><strong>${esc(money(t.total))}</strong></div><p>This creates a draft invoice. It does not email the customer. ERP will calculate the final total.</p>`;
   $('saveStatus').textContent='';$('confirmSave').disabled=!!window.RAJADHANI_PREVIEW_CONFIG;if(window.RAJADHANI_PREVIEW_CONFIG)$('saveStatus').textContent='Preview only. No records will be created.';$('reviewDialog').showModal();
