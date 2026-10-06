@@ -92,7 +92,7 @@ aside{min-height:0;overflow:hidden}.summary{height:100%;position:static;display:
 .full{min-height:30px;padding:5px 9px}.results{max-height:185px;font-size:10px;border-radius:4px}.results button{padding:6px}
 #saveButton{position:sticky;bottom:0;z-index:3;justify-content:center;gap:8px;min-height:34px;font-size:12px;box-shadow:0 -4px 14px #eef2ef,0 3px 8px #d75b3224}
 dialog{border-radius:7px}
-@media(max-width:720px){main{height:auto;overflow:auto}.workspace{grid-template-columns:1fr;overflow:visible}.maincolumn{overflow:visible}.summary{height:auto}.tablewrap{overflow-x:auto}.more .grid,.three,.twofields,.customergrid,.addressgrid{grid-template-columns:1fr 1fr}.twoslim,.summarygrid{grid-template-columns:1fr}}
+@media(max-width:600px){main{height:auto;overflow:auto}.workspace{grid-template-columns:1fr;overflow:visible}.maincolumn{overflow:visible}.summary{height:auto}.tablewrap{overflow-x:auto}.more .grid,.three,.twofields,.customergrid,.addressgrid{grid-template-columns:1fr 1fr}.twoslim,.summarygrid{grid-template-columns:1fr}}
 
 @media(max-width:1200px){
   .workspace{grid-template-columns:minmax(0,1fr) 300px}
@@ -132,7 +132,7 @@ dialog{border-radius:7px}
 #invoiceItemsCard th:nth-child(12),#invoiceItemsCard td:nth-child(12){width:3%;text-align:center}
 
 /* Keep all item columns visible in ERP's smaller modal viewport. */
-@media(max-width:1050px){
+@media(max-width:600px){
   main{height:auto;min-height:100vh;overflow:visible}
   form,.workspace{height:auto}
   .workspace{grid-template-columns:minmax(0,1fr);overflow:visible}
@@ -140,7 +140,7 @@ dialog{border-radius:7px}
   aside{overflow:visible}
   .summary{height:auto}
 }
-@media(max-width:720px){
+@media(max-width:600px){
   #invoiceItemsCard table{min-width:760px}
 }
 

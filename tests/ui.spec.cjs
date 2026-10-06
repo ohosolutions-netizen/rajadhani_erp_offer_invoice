@@ -62,8 +62,14 @@ test('line discount amounts and summary update after editing and removing rows',
 test('ERP popup widths expose net amount and remove controls; mobile can scroll',async({page})=>{
  await start(page);await customer(page);await page.locator('#salesOrder').selectOption('so1');
  await expect(page.locator('#lineItems tr')).toHaveCount(2);
- for(const width of [1440,1160,1050,900,760]){
+ for(const width of [1440,1160,1050,900,760,601]){
   await page.setViewportSize({width,height:680});
+  const panes=await page.locator('.workspace').evaluate(workspace=>{
+   const main=workspace.querySelector('.maincolumn').getBoundingClientRect();
+   const aside=workspace.querySelector('aside').getBoundingClientRect();
+   return {sideBySide:aside.left>=main.right-1,topAligned:Math.abs(aside.top-main.top)<=1};
+  });
+  expect(panes,`panes at viewport ${width}`).toEqual({sideBySide:true,topAligned:true});
   const layout=await page.locator('#invoiceItemsCard .tablewrap').evaluate(w=>{
    const right=w.getBoundingClientRect().right;
    const cells=[...w.querySelectorAll('tbody tr:first-child td')];
