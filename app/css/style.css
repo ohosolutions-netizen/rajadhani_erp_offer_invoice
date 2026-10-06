@@ -116,7 +116,8 @@ dialog{border-radius:7px}
 }
 
 /* Offer Invoice adds percentage and monetary discount columns. */
-#invoiceItemsCard table{min-width:1030px}
+#invoiceItemsCard table{min-width:0;width:100%}
+#invoiceItemsCard .tablewrap{overflow-x:auto}
 #invoiceItemsCard th:nth-child(1),#invoiceItemsCard td:nth-child(1){width:2%}
 #invoiceItemsCard th:nth-child(2),#invoiceItemsCard td:nth-child(2){width:23%}
 #invoiceItemsCard th:nth-child(3),#invoiceItemsCard td:nth-child(3){width:7%}
@@ -129,3 +130,18 @@ dialog{border-radius:7px}
 #invoiceItemsCard th:nth-child(10),#invoiceItemsCard td:nth-child(10){width:12%;padding:4px;text-align:left}
 #invoiceItemsCard th:nth-child(11),#invoiceItemsCard td:nth-child(11){width:10%;white-space:nowrap}
 #invoiceItemsCard th:nth-child(12),#invoiceItemsCard td:nth-child(12){width:3%;text-align:center}
+
+/* Keep all item columns visible in ERP's smaller modal viewport. */
+@media(max-width:1050px){
+  main{height:auto;min-height:100vh;overflow:visible}
+  form,.workspace{height:auto}
+  .workspace{grid-template-columns:minmax(0,1fr);overflow:visible}
+  .maincolumn{overflow:visible}
+  aside{overflow:visible}
+  .summary{height:auto}
+}
+@media(max-width:720px){
+  #invoiceItemsCard table{min-width:760px}
+}
+
+#invoiceItemsCard .remove{display:block;width:100%;min-width:0;padding:0;line-height:23px}

@@ -34,3 +34,25 @@ test('line discount amounts and summary update after editing and removing rows',
  await rows.nth(0).getByRole('button',{name:/Remove/}).click();await check();
  await expect(page.locator('#discountAmount')).toHaveText('− ₹0.00');
 });
+
+test('ERP popup widths expose net amount and remove controls; mobile can scroll',async({page})=>{
+ await start(page);await customer(page);await page.locator('#salesOrder').selectOption('so1');
+ await expect(page.locator('#lineItems tr')).toHaveCount(2);
+ for(const width of [1440,1160,1050,900,760]){
+  await page.setViewportSize({width,height:680});
+  const layout=await page.locator('#invoiceItemsCard .tablewrap').evaluate(w=>{
+   const right=w.getBoundingClientRect().right;
+   const cells=[...w.querySelectorAll('tbody tr:first-child td')];
+   return {fits:w.scrollWidth<=w.clientWidth+1,lastVisible:cells.at(-1).getBoundingClientRect().right<=right+1,netVisible:cells.at(-2).getBoundingClientRect().right<=right+1};
+  });
+  expect(layout,`viewport ${width}`).toEqual({fits:true,lastVisible:true,netVisible:true});
+  if(width===1160)await page.screenshot({path:'dist/OfferInvoicePopup.png',fullPage:true});
+ }
+ await page.setViewportSize({width:390,height:844});
+ const mobile=await page.locator('#invoiceItemsCard .tablewrap').evaluate(w=>{
+  w.scrollLeft=w.scrollWidth;
+  return {scrolled:w.scrollLeft>0,removeVisible:w.querySelector('tbody tr .remove').getBoundingClientRect().right<=w.getBoundingClientRect().right+1};
+ });
+ expect(mobile).toEqual({scrolled:true,removeVisible:true});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
