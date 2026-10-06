@@ -13,7 +13,7 @@ test('production SDK adapter sends one draft creation and locks after success',a
  const mock=fs.readFileSync('preview/mock-sdk.js','utf8');
  await page.route('**/zf_sdk.js',r=>r.fulfill({contentType:'text/javascript',body:mock+`;window.testConfig=window.RAJADHANI_PREVIEW_CONFIG;delete window.RAJADHANI_PREVIEW_CONFIG;const originalRequest=window.ZFAPPS.request;window.sent=[];window.ZFAPPS.request=async o=>{if(o.method==='POST'){window.sent.push(o);return {data:{body:JSON.stringify({code:0,invoice:{invoice_id:'created1',invoice_number:'INV-TEST',status:'draft',total:319.2}})}};}return originalRequest(o);};`}));
  await page.route('**/app/config.json',r=>{const c=JSON.parse(fs.readFileSync('app/config.json'));c.connectionLinkName='test';c.invoiceQuantityMode='pieces';for(const [k,v]of Object.entries(c.customFields)){v.id='test-'+k;v.required=false;}c.requireSalesperson=false;r.fulfill({json:c});});
- await page.goto('/app/widget.html');await expect(page.locator('#connectionStatus')).toHaveText('ERP connected');await customer(page);await item(page,'Premium');await page.locator('[data-field=discount]').fill('12.5');await page.locator('#saveButton').click();await page.locator('#confirmSave').click();await expect(page.locator('#notice')).toContainText('INV-TEST saved');await expect(page.locator('#saveButton')).toBeDisabled();const sent=await page.evaluate(()=>window.sent);expect(sent.length).toBe(1);expect(sent[0].connection_link_name).toBe('test');expect(sent[0].url_query).toContainEqual({key:'send',value:'false'});const payload=JSON.parse(sent[0].body.raw);expect(payload.line_items[0].item_id).toBe('i1');expect(payload.line_items[0].discount).toBe('12.5%');expect(payload.discount_type).toBe('item_level');expect(payload.is_discount_before_tax).toBe(true);expect(payload.discount).toBeUndefined();
+ await page.goto('/app/widget.html');await expect(page.locator('#connectionStatus')).toHaveText('ERP connected');await customer(page);await item(page,'Premium');await page.locator('[data-field=discount]').fill('12.5');await page.locator('#saveButton').click();await page.locator('#confirmSave').click();await expect(page.locator('#notice')).toContainText('INV-TEST saved');await expect(page.locator('#saveButton')).toBeDisabled();const sent=await page.evaluate(()=>window.sent);expect(sent.length).toBe(1);expect(sent[0].connection_link_name).toBe('test');expect(sent[0].url_query).toContainEqual({key:'send',value:'false'});const payload=JSON.parse(sent[0].body.raw);expect(payload.line_items[0].item_id).toBe('i1');expect(payload.line_items[0].discount).toBe('12.5%');expect(payload.discount_type).toBe('item_level');expect(payload.is_discount_before_tax).toBe(true);expect(payload.discount).toBeUndefined();expect(payload.adjustment).toBe(-0.01);
 });
 
 test('line discount amounts and summary update after editing and removing rows',async({page})=>{
@@ -55,4 +55,20 @@ test('ERP popup widths expose net amount and remove controls; mobile can scroll'
  });
  expect(mobile).toEqual({scrolled:true,removeVisible:true});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('no Start over and odd-paise GST components round before invoice total',async({page})=>{
+ await start(page);
+ await expect(page.getByRole('button',{name:/Start over/})).toHaveCount(0);
+ await customer(page);await scanItem(page,'PAP-A4-75');
+ const row=page.locator('#lineItems tr').first();
+ await expect(row.locator('[data-field=discount]')).toBeEnabled();
+ await row.locator('[data-field=quantity]').fill('1');
+ await row.locator('[data-field=rate]').fill('220.5');
+ await row.locator('[data-field=tax]').selectOption({label:'GST 5 (5%)'});
+ await expect(page.locator('#taxBreakdown')).toContainText('CGST₹55.13');
+ await expect(page.locator('#taxBreakdown')).toContainText('SGST₹55.13');
+ await expect(page.locator('#taxTotal')).toHaveText('₹110.26');
+ await expect(page.locator('#roundValue')).toHaveText('-₹0.26');
+ await expect(page.locator('#grandTotal')).toHaveText('₹2,315.00');
 });

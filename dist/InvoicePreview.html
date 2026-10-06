@@ -30,7 +30,6 @@ body{background:#eef2ef;font-size:11px;line-height:1.25}
 .compacttools .status,.compacttools .avatar{display:none}
 .compacttools .iconbutton{font-size:16px;width:24px;height:24px;padding:0;background:#fff;border:1px solid #dce2db;border-radius:5px}
 main{max-width:none;width:100%;height:100vh;overflow:hidden;padding:8px}
-.resetmini{position:absolute;right:40px;top:6px;z-index:6;min-height:24px;padding:3px 8px;font-size:10px;background:#fff}
 .breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
 .notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(820px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:12px 14px 12px 18px;font-size:14px;line-height:1.45;font-weight:700;text-align:center;border-radius:12px;box-shadow:0 18px 45px #00000042;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid #2b2f33;background:#111827;color:#fff;letter-spacing:.01em}
 .notice:before{content:'!';display:inline-grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:999px;background:#fff;color:#111827;font-weight:850;font-size:15px;line-height:1}
@@ -149,7 +148,7 @@ dialog{border-radius:7px}
 </style></head>
 <body>
 <header class="topbar compacttools"><span id="connectionStatus" class="status">Connecting to ERP</span><button type="button" class="iconbutton" id="settingsButton" aria-label="Connection settings">⚙</button><span class="avatar" id="avatar">R</span></header>
-<main><button type="button" id="resetButton" class="button quiet resetmini">↺ Start over</button>
+<main>
 <div id="notice" class="notice" role="status" hidden><span id="noticeText"></span><button type="button" id="noticeClose" class="noticeclose" aria-label="Close warning">×</button></div>
 <form id="invoiceForm"><div class="workspace"><div class="maincolumn">
 <section class="card"><div class="sectionheading"><div><span class="step">01</span><h2>Customer & offer invoice</h2></div><span class="subtle">Start with who you’re billing</span></div><div class="cardbody"><div class="grid customergrid"><div class="field searchfield"><label for="customerSearch">Customer <em>*</em></label><div class="searchbox"><span>⌕</span><input id="customerSearch" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="customerResults" placeholder="Search customers by name…" required><kbd>⌘ K</kbd></div><div id="customerResults" class="results" role="listbox" hidden></div><small id="customerHint">Search your ERP customer directory</small></div><div class="field"><label for="invoiceDate">Invoice date <em>*</em></label><input id="invoiceDate" type="date" required></div><div class="field"><label for="invoiceNumber">Invoice number</label><input id="invoiceNumber" readonly placeholder="Assigned by ERP" class="mutedinput"></div></div>
@@ -162,7 +161,6 @@ dialog{border-radius:7px}
 </div><aside><section class="card summary"><div class="sectionheading"><h2>Subtotals & delivery</h2><span class="currency" id="currencyLabel">INR</span></div><div class="cardbody"><div class="sideblocktitle">Transporter information</div><div class="grid twoslim" id="dispatchFields"></div><div class="field remarks"><label for="notes">Remarks</label><textarea id="notes" rows="2" placeholder="Delivery instructions or invoice note"></textarea></div><div class="sideblocktitle summarytitle">Summary information</div><div class="summarygrid"><div class="summaryrow"><span>Total</span><strong id="subtotal">₹0.00</strong></div><div class="summaryrow"><span>Total Discount Amount</span><span class="green" id="discountAmount">− ₹0.00</span></div><div class="summaryrow"><span>Tax Amount</span><span id="taxTotal">₹0.00</span></div><div id="taxBreakdown"></div><div class="summaryrow"><span>Round off</span><span id="roundValue">₹0.00</span></div><div class="summaryrow billamount"><span>Bill Amount</span><strong id="grandTotal">₹0.00</strong></div></div><small id="totalDetail" class="totaldetail">0 items in this invoice</small><button class="button primary full" id="saveButton" type="submit">Submit offer invoice <span>→</span></button></div></section></aside></div></form><footer><span id="footerStatus">Zoho ERP widget</span></footer></main>
 <dialog id="reviewDialog"><div class="dialogheading"><div><div class="eyebrow">READY FOR A QUICK CHECK</div><h2>Review your invoice</h2></div><button type="button" class="iconbutton" data-close="reviewDialog" aria-label="Close review">×</button></div><div id="reviewContent"></div><div class="dialogactions"><button type="button" class="button" data-close="reviewDialog">Back to editing</button><button type="button" class="button primary" id="confirmSave">Save draft to ERP →</button></div><p id="saveStatus" role="status"></p></dialog>
 <dialog id="settingsDialog"><div class="dialogheading"><h2>ERP connection</h2><button class="iconbutton" type="button" data-close="settingsDialog" aria-label="Close settings">×</button></div><p>Use an authorized Zoho connection. Never enter passwords or access tokens here.</p><div class="field"><label for="connectionName">Connection link name</label><input id="connectionName" placeholder="Your authorized connection link name"></div><div class="field"><label for="orgId">Organization ID</label><input id="orgId" placeholder="Detected from Zoho ERP"></div><p class="subtle">These settings apply to this session. For deployment, update app/config.json and the manifest’s usedConnections. Business-field mappings are configured in app/config.json.</p><button type="button" class="button primary" id="connectButton">Connect & load ERP data</button></dialog>
-<dialog id="resetDialog"><h2>Start a new invoice?</h2><p>This clears the current unsaved form.</p><div class="dialogactions"><button class="button" type="button" data-close="resetDialog">Keep editing</button><button class="button primary" type="button" id="confirmReset">Start over</button></div></dialog>
 <script nomodule>document.body.textContent='Please open this widget in a current browser.';</script><script>// Preview fixtures only. This file is never included in the ERP widget ZIP.
 (() => {
 const fields = {
@@ -275,7 +273,7 @@ function lineAmounts(line) {
   const discount = round(gross * (line.discount ?? 0) / 100);
   return { gross, discount, taxable: round(gross - discount) };
 }
-function calculate(lines, rounded = false) {
+function calculate(lines, rounded = false, intraState = false) {
   const invoiceLines = lines.filter(l => !l.notFound);
   const subtotal = round(invoiceLines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
   const discountAmount = round(invoiceLines.reduce((sum, line) => sum + lineAmounts(line).discount, 0));
@@ -283,13 +281,16 @@ function calculate(lines, rounded = false) {
   const taxMap = new Map();
   const tax = round(invoiceLines.reduce((s, l) => {
     const base = lineAmounts(l).taxable;
-    const amount = round(base * (l.tax?.percentage || 0) / 100);
+    // Round each GST component independently, as ERP does for line taxes.
+    // Never assign the odd paise to just one side of CGST/SGST.
+    const rawTax = base * (l.tax?.percentage || 0) / 100;
+    const amount = intraState ? round(round(rawTax / 2) * 2) : round(rawTax);
     if (l.tax) taxMap.set(l.tax.name, round((taxMap.get(l.tax.name) || 0) + amount));
     return s + amount;
   }, 0));
   const beforeRounding = round(taxable + tax);
   const adjustment = rounded ? round(Math.round(beforeRounding) - beforeRounding) : 0;
-  return { subtotal, discount: discountAmount, taxable, tax, adjustment, total: round(beforeRounding + adjustment), taxes: [...taxMap] };
+  return { subtotal, discount: discountAmount, taxable, tax, cgst: intraState ? round(tax / 2) : 0, sgst: intraState ? round(tax / 2) : 0, adjustment, total: round(beforeRounding + adjustment), taxes: [...taxMap] };
 }
 function validateInvoice(state, values, config) {
   const errors = [];
@@ -316,7 +317,7 @@ function validateInvoice(state, values, config) {
   return [...new Set(errors)];
 }
 function makePayload(state, values, config) {
-  const totals = calculate(state.lines, values.rounded);
+  const totals = calculate(state.lines, values.rounded, values.place_of_supply === (config.organizationStateCode || 'KL'));
   const payload = {
     customer_id: String(state.customer.contact_id), date: values.date,
     place_of_supply: values.place_of_supply,
@@ -450,7 +451,7 @@ class ERP {
 
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const config = {"apiBase":"https://www.zohoapis.in/erp/v3","connectionLinkName":"erp_admin","organizationId":"","customFields":{"billType":{"label":"Bill type","id":"","required":true},"billCreatedBy":{"label":"Bill created by","id":"","required":false},"transport":{"label":"Transport","id":"","required":false},"agent":{"label":"Agent name","id":"","required":false},"vehicle":{"label":"Vehicle number","id":"","required":false},"whatsapp":{"label":"WhatsApp number","id":"","required":false},"mobile":{"label":"Mobile number","id":"","required":false},"shippingPhone":{"label":"Shipping phone","id":"","required":false}},"itemFields":{"mu":"","ratio":""},"lookupSources":{},"requireSalesperson":true,"requireLocation":false,"invoiceQuantityMode":"pieces"};
+const config = {"apiBase":"https://www.zohoapis.in/erp/v3","connectionLinkName":"erp_admin","organizationId":"","customFields":{"billType":{"label":"Bill type","id":"","required":true},"billCreatedBy":{"label":"Bill created by","id":"","required":false},"transport":{"label":"Transport","id":"","required":false},"agent":{"label":"Agent name","id":"","required":false},"vehicle":{"label":"Vehicle number","id":"","required":false},"whatsapp":{"label":"WhatsApp number","id":"","required":false},"mobile":{"label":"Mobile number","id":"","required":false},"shippingPhone":{"label":"Shipping phone","id":"","required":false}},"itemFields":{"mu":"","ratio":""},"lookupSources":{},"requireSalesperson":true,"requireLocation":false,"invoiceQuantityMode":"pieces","organizationStateCode":"KL"};
 if (window.RAJADHANI_PREVIEW_CONFIG) Object.assign(config, window.RAJADHANI_PREVIEW_CONFIG);
 const api = new ERP(config, window.ZFAPPS);
 const state = { customer: null, lines: [], taxes: [], currency: 'INR', busy: false, saved: false, allowClose: false, uncertain: false, customerVersion: 0, pendingOperations: 0, pendingSO: { item: null, rows: [], loading: false, error: '' } };
@@ -508,12 +509,11 @@ function getValues() {
     custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, $(`cf_${k}`)?.value?.trim?.() ?? ''])) };
 }
 function totals() {
-  const v = getValues(); const t = calculate(state.lines, v.rounded);
+  const v = getValues(); const t = calculate(state.lines, v.rounded, v.place_of_supply === (config.organizationStateCode || 'KL'));
   for (const [id, key] of Object.entries({subtotal:'subtotal',discountAmount:'discount',taxTotal:'tax',roundValue:'adjustment',grandTotal:'total'})) $(id).textContent = `${id === 'discountAmount' ? '− ' : ''}${money(t[key])}`;
-  const intraState = v.place_of_supply === 'KL';
-  const halfTax = Math.round((t.tax / 2 + Number.EPSILON) * 100) / 100;
+  const intraState = v.place_of_supply === (config.organizationStateCode || 'KL');
   $('taxBreakdown').innerHTML = intraState
-    ? `<div class="summaryrow"><span>CGST</span><span>${esc(money(halfTax))}</span></div><div class="summaryrow"><span>SGST</span><span>${esc(money(t.tax - halfTax))}</span></div>`
+    ? `<div class="summaryrow"><span>CGST</span><span>${esc(money(t.cgst))}</span></div><div class="summaryrow"><span>SGST</span><span>${esc(money(t.sgst))}</span></div>`
     : `<div class="summaryrow"><span>IGST</span><span>${esc(money(t.tax))}</span></div>`;
   $('totalDetail').textContent = `${state.lines.length} item${state.lines.length === 1 ? '' : 's'} in this invoice`;
   $('lineCount').textContent = state.lines.length;
@@ -815,14 +815,13 @@ async function connect() {
   }catch(e){$('connectionStatus').textContent='Setup required';$('connectionStatus').className='status offline';notice(e.message);}
 }
 $('settingsButton').onclick=()=>{$('connectionName').value=config.connectionLinkName;$('orgId').value=config.organizationId;$('settingsDialog').showModal();};
-$('connectButton').onclick=async()=>{if(state.lines.length||state.customer){notice('Start over before changing the ERP connection.');$('settingsDialog').close();return;}config.connectionLinkName=$('connectionName').value.trim();config.organizationId=$('orgId').value.trim();$('settingsDialog').close();await connect();};
+$('connectButton').onclick=async()=>{if(state.lines.length||state.customer){notice('Close and reopen the widget before changing the ERP connection.');$('settingsDialog').close();return;}config.connectionLinkName=$('connectionName').value.trim();config.organizationId=$('orgId').value.trim();$('settingsDialog').close();await connect();};
 for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.dataset.close).close();
-$('resetButton').onclick=()=>$('resetDialog').showModal();$('confirmReset').onclick=()=>{state.allowClose=true;location.reload();};
 $('invoiceForm').addEventListener('submit',e=>{
   e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
   if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
   const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');return;}
-  approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.rounded);
+  approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.rounded,v.place_of_supply === (config.organizationStateCode || 'KL'));
   $('reviewContent').innerHTML=`<div class="summaryrow"><span>Customer</span><strong>${esc(state.customer.contact_name)}</strong></div><div class="summaryrow"><span>Invoice date</span><strong>${esc(v.date)}</strong></div>${state.lines.map(l=>`<div class="summaryrow"><span>${esc(l.name)} · ${l.quantity} × ${l.pieces ?? "?"} = ${l.pieces ? pieceQuantity(l) : "?"} pieces · ${l.discount ?? 0}% discount (${esc(money(lineAmounts(l).discount))})</span><strong>${esc(money(lineAmounts(l).taxable))}</strong></div>`).join('')}<div class="summaryrow"><span>Total Discount Amount</span><strong>${esc(money(t.discount))}</strong></div><div class="grandtotal"><span>Estimated offer invoice total</span><strong>${esc(money(t.total))}</strong></div><p>This creates a draft invoice. It does not email the customer. ERP will calculate the final total.</p>`;
   $('saveStatus').textContent='';$('confirmSave').disabled=!!window.RAJADHANI_PREVIEW_CONFIG;if(window.RAJADHANI_PREVIEW_CONFIG)$('saveStatus').textContent='Preview only. No records will be created.';$('reviewDialog').showModal();
 });

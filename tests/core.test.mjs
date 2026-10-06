@@ -126,3 +126,22 @@ test('discount boundaries, rounding, exemptions and invalid percentages',()=>{
   assert.deepEqual(validateInvoice({...state,lines:[{...lines[0],discount}]},values,config),[]);
  }
 });
+
+test('odd-paise GST rounds both components before invoice round-off and payload adjustment',()=>{
+ const offerLines=[{...lines[0],quantity:4,rate:735,discount:25,tax:{id:'gst5',name:'GST 5',percentage:5}}];
+ const t=calculate(offerLines,true,true);
+ assert.equal(t.taxable,2205);assert.equal(t.cgst,55.13);assert.equal(t.sgst,55.13);
+ assert.equal(t.tax,110.26);assert.equal(t.adjustment,-0.26);assert.equal(t.total,2315);
+ const p=makePayload({...state,lines:offerLines},{...values,rounded:true},config);
+ assert.equal(p.adjustment,-0.26);
+ assert.equal(core.round(t.taxable+t.cgst+t.sgst+p.adjustment),2315);
+ const interstate=calculate(offerLines,true,false);
+ assert.equal(interstate.tax,110.25);assert.equal(interstate.adjustment,-0.25);
+});
+test('multiple lines accumulate independently rounded GST components',()=>{
+ const items=[{...lines[0],quantity:1,rate:1,discount:0,tax:{id:'gst5',name:'GST 5',percentage:5}}];
+ const t=calculate([...items,...items],false,true);
+ assert.equal(t.cgst,0.06);assert.equal(t.sgst,0.06);assert.equal(t.tax,0.12);assert.equal(t.total,2.12);
+ const zero=calculate([{...items[0],discount:100}],true,true);
+ assert.equal(zero.tax,0);assert.equal(zero.total,0);
+});

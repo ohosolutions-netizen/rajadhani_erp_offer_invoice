@@ -51,5 +51,6 @@
   "lookupSources": {},
   "requireSalesperson": true,
   "requireLocation": false,
-  "invoiceQuantityMode": "pieces"
+  "invoiceQuantityMode": "pieces",
+  "organizationStateCode": "KL"
 }

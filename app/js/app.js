@@ -60,12 +60,11 @@ function getValues() {
     custom: Object.fromEntries(Object.keys(config.customFields).map(k => [k, $(`cf_${k}`)?.value?.trim?.() ?? ''])) };
 }
 function totals() {
-  const v = getValues(); const t = calculate(state.lines, v.rounded);
+  const v = getValues(); const t = calculate(state.lines, v.rounded, v.place_of_supply === (config.organizationStateCode || 'KL'));
   for (const [id, key] of Object.entries({subtotal:'subtotal',discountAmount:'discount',taxTotal:'tax',roundValue:'adjustment',grandTotal:'total'})) $(id).textContent = `${id === 'discountAmount' ? '− ' : ''}${money(t[key])}`;
-  const intraState = v.place_of_supply === 'KL';
-  const halfTax = Math.round((t.tax / 2 + Number.EPSILON) * 100) / 100;
+  const intraState = v.place_of_supply === (config.organizationStateCode || 'KL');
   $('taxBreakdown').innerHTML = intraState
-    ? `<div class="summaryrow"><span>CGST</span><span>${esc(money(halfTax))}</span></div><div class="summaryrow"><span>SGST</span><span>${esc(money(t.tax - halfTax))}</span></div>`
+    ? `<div class="summaryrow"><span>CGST</span><span>${esc(money(t.cgst))}</span></div><div class="summaryrow"><span>SGST</span><span>${esc(money(t.sgst))}</span></div>`
     : `<div class="summaryrow"><span>IGST</span><span>${esc(money(t.tax))}</span></div>`;
   $('totalDetail').textContent = `${state.lines.length} item${state.lines.length === 1 ? '' : 's'} in this invoice`;
   $('lineCount').textContent = state.lines.length;
@@ -367,14 +366,13 @@ async function connect() {
   }catch(e){$('connectionStatus').textContent='Setup required';$('connectionStatus').className='status offline';notice(e.message);}
 }
 $('settingsButton').onclick=()=>{$('connectionName').value=config.connectionLinkName;$('orgId').value=config.organizationId;$('settingsDialog').showModal();};
-$('connectButton').onclick=async()=>{if(state.lines.length||state.customer){notice('Start over before changing the ERP connection.');$('settingsDialog').close();return;}config.connectionLinkName=$('connectionName').value.trim();config.organizationId=$('orgId').value.trim();$('settingsDialog').close();await connect();};
+$('connectButton').onclick=async()=>{if(state.lines.length||state.customer){notice('Close and reopen the widget before changing the ERP connection.');$('settingsDialog').close();return;}config.connectionLinkName=$('connectionName').value.trim();config.organizationId=$('orgId').value.trim();$('settingsDialog').close();await connect();};
 for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.dataset.close).close();
-$('resetButton').onclick=()=>$('resetDialog').showModal();$('confirmReset').onclick=()=>{state.allowClose=true;location.reload();};
 $('invoiceForm').addEventListener('submit',e=>{
   e.preventDefault();if(state.saved||state.busy||state.uncertain)return;
   if(state.pendingOperations){notice('Wait for ERP records to finish loading before reviewing.');return;}
   const v=getValues(),errors=validateInvoice(state,v,config);if(errors.length){notice(errors.join(' '),'error');return;}
-  approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.rounded);
+  approvedPayload=makePayload(state,v,config);const t=calculate(state.lines,v.rounded,v.place_of_supply === (config.organizationStateCode || 'KL'));
   $('reviewContent').innerHTML=`<div class="summaryrow"><span>Customer</span><strong>${esc(state.customer.contact_name)}</strong></div><div class="summaryrow"><span>Invoice date</span><strong>${esc(v.date)}</strong></div>${state.lines.map(l=>`<div class="summaryrow"><span>${esc(l.name)} · ${l.quantity} × ${l.pieces ?? "?"} = ${l.pieces ? pieceQuantity(l) : "?"} pieces · ${l.discount ?? 0}% discount (${esc(money(lineAmounts(l).discount))})</span><strong>${esc(money(lineAmounts(l).taxable))}</strong></div>`).join('')}<div class="summaryrow"><span>Total Discount Amount</span><strong>${esc(money(t.discount))}</strong></div><div class="grandtotal"><span>Estimated offer invoice total</span><strong>${esc(money(t.total))}</strong></div><p>This creates a draft invoice. It does not email the customer. ERP will calculate the final total.</p>`;
   $('saveStatus').textContent='';$('confirmSave').disabled=!!window.RAJADHANI_PREVIEW_CONFIG;if(window.RAJADHANI_PREVIEW_CONFIG)$('saveStatus').textContent='Preview only. No records will be created.';$('reviewDialog').showModal();
 });

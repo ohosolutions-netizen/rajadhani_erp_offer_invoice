@@ -17,7 +17,7 @@ The nested `Rajadhani ERP Edit invoice/` folder is a separate existing edit widg
 
 ## Interface
 
-Customer search with keyboard navigation; ERP billing/shipping addresses; same-as-billing; customer GSTIN; invoice date; automatic invoice numbering; payment terms; salesperson; location; place of supply; bill type; sale type; bill creator; mobile and WhatsApp; shipping phone/GSTIN; item search by name/SKU; barcode-scanner keyboard input; stock and UoM; pieces per pack and derived piece quantity; order quantity/rate/tax editing; sales-order import; transport/agent/vehicle; remarks; invoice pending; discount; round off; tax summary; review before draft creation; start over; responsive mobile layout.
+Customer search with keyboard navigation; ERP billing/shipping addresses; same-as-billing; customer GSTIN; invoice date; automatic invoice numbering; payment terms; salesperson; location; place of supply; bill type; sale type; bill creator; mobile and WhatsApp; shipping phone/GSTIN; item search by name/SKU; barcode-scanner keyboard input; stock and UoM; pieces per pack and derived piece quantity; order quantity/rate/tax editing; sales-order import; transport/agent/vehicle; remarks; invoice pending; discount; round off; tax summary; review before draft creation; responsive mobile layout.
 
 M Unit and Ratio come from item master custom fields. M Unit = Set uses a positive whole-number Ratio as pieces per pack; M Unit = Pieces uses 1. P. quantity = order quantity × pieces per pack. Amount = P. quantity × rate per piece. Discounts, estimated taxes and review amounts follow this calculation. Invalid or missing M Unit/Ratio blocks saving.
 
@@ -103,3 +103,8 @@ Customer search now uses `contact_name_contains` and case-insensitive name match
 Zoho's widget creation guide specifies the SDK initialization, manifest entry points, and ZET validate/pack/upload flow. The key-configuration guide supports `invoice.list.sidebar` and `invoice.creation.sidebar`; these existing modal locations are retained. The create-widget ERP template uses `service: ERP` (the generic key table also mentions FINANCE); this package retains the working ERP value and passes ZET validation. The Invoice API documents `item_level` discounts and before-tax application.
 
 Upload `dist/RajadhaniOfferInvoice.zip` in Sigma → extension → Configure → Upload Widget, then save/install the extension into your ERP organization. Both entries appear as **Rajadhani Offer Invoice** in Invoices. The package retains the supplied connection and configuration. Live tenant installation and totals must be checked in Zoho; local tests use mocked ERP responses.
+
+
+## GST component rounding
+
+The Start over button and its reset dialog have been removed. For intra-state invoices (`place_of_supply` equals `organizationStateCode`, currently `KL`), CGST and SGST are each rounded to two decimals on every discounted line before accumulating tax. The final bill amount is then rounded to the nearest rupee, and the resulting `adjustment` is sent to ERP along with the existing tax IDs. For example, ₹2,205 at 5% GST gives ₹55.13 CGST + ₹55.13 SGST = ₹110.26 tax, then a −₹0.26 adjustment gives a ₹2,315 invoice. Interstate tax retains its existing two-decimal calculation.

@@ -29,7 +29,6 @@ body{background:#eef2ef;font-size:11px;line-height:1.25}
 .compacttools .status,.compacttools .avatar{display:none}
 .compacttools .iconbutton{font-size:16px;width:24px;height:24px;padding:0;background:#fff;border:1px solid #dce2db;border-radius:5px}
 main{max-width:none;width:100%;height:100vh;overflow:hidden;padding:8px}
-.resetmini{position:absolute;right:40px;top:6px;z-index:6;min-height:24px;padding:3px 8px;font-size:10px;background:#fff}
 .breadcrumb,.pageheading,.helpbox,.summarynote,footer{display:none}
 .notice{position:fixed;left:50%;top:14px;right:auto;transform:translateX(-50%);z-index:50;margin:0;max-width:min(820px,calc(100vw - 48px));min-width:min(420px,calc(100vw - 48px));padding:12px 14px 12px 18px;font-size:14px;line-height:1.45;font-weight:700;text-align:center;border-radius:12px;box-shadow:0 18px 45px #00000042;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid #2b2f33;background:#111827;color:#fff;letter-spacing:.01em}
 .notice:before{content:'!';display:inline-grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:999px;background:#fff;color:#111827;font-weight:850;font-size:15px;line-height:1}

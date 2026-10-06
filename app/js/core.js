@@ -57,7 +57,7 @@ export function lineAmounts(line) {
   const discount = round(gross * (line.discount ?? 0) / 100);
   return { gross, discount, taxable: round(gross - discount) };
 }
-export function calculate(lines, rounded = false) {
+export function calculate(lines, rounded = false, intraState = false) {
   const invoiceLines = lines.filter(l => !l.notFound);
   const subtotal = round(invoiceLines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
   const discountAmount = round(invoiceLines.reduce((sum, line) => sum + lineAmounts(line).discount, 0));
@@ -65,13 +65,16 @@ export function calculate(lines, rounded = false) {
   const taxMap = new Map();
   const tax = round(invoiceLines.reduce((s, l) => {
     const base = lineAmounts(l).taxable;
-    const amount = round(base * (l.tax?.percentage || 0) / 100);
+    // Round each GST component independently, as ERP does for line taxes.
+    // Never assign the odd paise to just one side of CGST/SGST.
+    const rawTax = base * (l.tax?.percentage || 0) / 100;
+    const amount = intraState ? round(round(rawTax / 2) * 2) : round(rawTax);
     if (l.tax) taxMap.set(l.tax.name, round((taxMap.get(l.tax.name) || 0) + amount));
     return s + amount;
   }, 0));
   const beforeRounding = round(taxable + tax);
   const adjustment = rounded ? round(Math.round(beforeRounding) - beforeRounding) : 0;
-  return { subtotal, discount: discountAmount, taxable, tax, adjustment, total: round(beforeRounding + adjustment), taxes: [...taxMap] };
+  return { subtotal, discount: discountAmount, taxable, tax, cgst: intraState ? round(tax / 2) : 0, sgst: intraState ? round(tax / 2) : 0, adjustment, total: round(beforeRounding + adjustment), taxes: [...taxMap] };
 }
 export function validateInvoice(state, values, config) {
   const errors = [];
@@ -98,7 +101,7 @@ export function validateInvoice(state, values, config) {
   return [...new Set(errors)];
 }
 export function makePayload(state, values, config) {
-  const totals = calculate(state.lines, values.rounded);
+  const totals = calculate(state.lines, values.rounded, values.place_of_supply === (config.organizationStateCode || 'KL'));
   const payload = {
     customer_id: String(state.customer.contact_id), date: values.date,
     place_of_supply: values.place_of_supply,
