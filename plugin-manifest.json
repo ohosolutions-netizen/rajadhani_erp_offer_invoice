@@ -10,14 +10,14 @@
     "widgets": [
       {
         "location": "invoice.list.sidebar",
-        "name": "Rajadhani Invoice",
+        "name": "Rajadhani Offer Invoice",
         "url": "/app/widget.html",
         "logo": "/app/img/logo.svg",
         "widget_type": "modal"
       },
       {
         "location": "invoice.creation.sidebar",
-        "name": "Rajadhani Invoice",
+        "name": "Rajadhani Offer Invoice",
         "url": "/app/widget.html",
         "logo": "/app/img/logo.svg",
         "widget_type": "modal"

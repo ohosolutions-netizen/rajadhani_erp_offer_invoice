@@ -52,14 +52,19 @@ export function itemPacking(item, fields = {}) {
   return {mu:mu || 'Unknown',pieces:null,packingError:'M Unit must be Set or Pieces. Map M Unit and Ratio to the item master fields.'};
 }
 export const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
-export function calculate(lines, discount = 0, type = 'percent', rounded = false) {
+export function lineAmounts(line) {
+  const gross = round(pieceQuantity(line) * line.rate);
+  const discount = round(gross * (line.discount ?? 0) / 100);
+  return { gross, discount, taxable: round(gross - discount) };
+}
+export function calculate(lines, rounded = false) {
   const invoiceLines = lines.filter(l => !l.notFound);
   const subtotal = round(invoiceLines.reduce((s, l) => s + round(pieceQuantity(l) * l.rate), 0));
-  const discountAmount = round(type === 'percent' ? subtotal * discount / 100 : discount);
+  const discountAmount = round(invoiceLines.reduce((sum, line) => sum + lineAmounts(line).discount, 0));
   const taxable = round(subtotal - discountAmount);
   const taxMap = new Map();
   const tax = round(invoiceLines.reduce((s, l) => {
-    const base = round(pieceQuantity(l) * l.rate) * (subtotal ? taxable / subtotal : 0);
+    const base = lineAmounts(l).taxable;
     const amount = round(base * (l.tax?.percentage || 0) / 100);
     if (l.tax) taxMap.set(l.tax.name, round((taxMap.get(l.tax.name) || 0) + amount));
     return s + amount;
@@ -78,11 +83,9 @@ export function validateInvoice(state, values, config) {
   if (state.lines.some(l => l.notFound)) errors.push('Remove or correct scanned items marked Item not found.');
   if (config.requireSalesperson && !values.salesperson_id) errors.push('Select a salesperson.');
   if (config.requireLocation && !values.location_id) errors.push('Select a business location.');
-  if (!Number.isFinite(values.discount) || values.discount < 0 || (values.discountType === 'percent' && values.discount > 100)) errors.push('Enter a valid discount (0–100 for a percentage).');
-  const total = calculate(state.lines, values.discount, values.discountType, values.rounded);
-  if (total.taxable < 0) errors.push('Discount cannot exceed the subtotal.');
   if (!['pieces','order'].includes(config.invoiceQuantityMode)) errors.push('Confirm how order quantity and P. quantity should be saved to ERP before saving.');
   invoiceLines.forEach((line, index) => {
+    if (!Number.isFinite(line.discount ?? 0) || (line.discount ?? 0) < 0 || (line.discount ?? 0) > 100) errors.push(`Item ${index + 1}: enter a discount percentage from 0 to 100.`);
     if (line.packingError) errors.push(`Item ${index + 1}: ${line.packingError}`);
     if (!Number.isFinite(line.quantity) || line.quantity <= 0 || !Number.isFinite(line.rate) || line.rate < 0) errors.push(`Item ${index + 1}: enter a positive quantity and a non-negative rate.`);
     if (!line.tax && !line.tax_exemption_id) errors.push(`Item ${index + 1}: choose an ERP tax or use an item with a configured exemption.`);
@@ -95,17 +98,17 @@ export function validateInvoice(state, values, config) {
   return [...new Set(errors)];
 }
 export function makePayload(state, values, config) {
-  const totals = calculate(state.lines, values.discount, values.discountType, values.rounded);
+  const totals = calculate(state.lines, values.rounded);
   const payload = {
     customer_id: String(state.customer.contact_id), date: values.date,
     place_of_supply: values.place_of_supply,
     line_items: state.lines.filter(l => !l.notFound).map((l, index) => ({
       item_id: String(l.item_id), quantity: config.invoiceQuantityMode === 'pieces' ? pieceQuantity(l) : l.quantity, rate: config.invoiceQuantityMode === 'order' ? l.rate * (l.pieces ?? 1) : l.rate, item_order: index + 1,
+      discount: `${l.discount ?? 0}%`,
       ...(l.tax ? { tax_id: String(l.tax.id) } : { tax_exemption_id: l.tax_exemption_id }),
       ...(l.salesorder_item_id ? { salesorder_item_id: String(l.salesorder_item_id) } : {})
     })),
-    discount: values.discountType === 'percent' ? `${values.discount}%` : values.discount,
-    discount_type: 'entity_level', is_discount_before_tax: true, is_inclusive_tax: false,
+    discount_type: 'item_level', is_discount_before_tax: true, is_inclusive_tax: false,
     adjustment: totals.adjustment, adjustment_description: 'Rounding', notes: values.notes,
     custom_fields: Object.entries(config.customFields).filter(([k, m]) => m.id && values.custom[k] !== '' && values.custom[k] != null).map(([k, m]) => ({ customfield_id: String(m.id), value: values.custom[k] }))
   };

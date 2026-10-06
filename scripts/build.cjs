@@ -16,6 +16,6 @@ fs.writeFileSync('dist/index.html',makeHtml({preview:false}));
 // ZET packages only app/ + manifest; preview fixtures stay outside the deployable app.
 execFileSync(path.resolve('node_modules/.bin/zet'),['validate'],{stdio:'inherit'});
 execFileSync(path.resolve('node_modules/.bin/zet'),['pack'],{stdio:'inherit'});
-const toolkitZip=fs.readdirSync('dist').find(n=>n.endsWith('.zip')&&n!=='RajadhaniInvoice.zip'&&n!=='RajadhaniInvoiceSource.zip');
-if(toolkitZip)fs.renameSync(path.join('dist',toolkitZip),'dist/RajadhaniInvoice.zip');
-console.log('Built dist/RajadhaniInvoice.zip, dist/InvoicePreview.html and dist/index.html');
+const toolkitZip=path.basename(process.cwd())+'.zip';
+if(fs.existsSync(path.join('dist',toolkitZip)))fs.renameSync(path.join('dist',toolkitZip),'dist/RajadhaniOfferInvoice.zip');
+console.log('Built dist/RajadhaniOfferInvoice.zip, dist/InvoicePreview.html and dist/index.html');

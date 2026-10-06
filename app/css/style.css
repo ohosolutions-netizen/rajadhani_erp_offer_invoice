@@ -114,3 +114,18 @@ dialog{border-radius:7px}
   th:nth-child(8),td:nth-child(8){width:10%}
   th:nth-child(9),td:nth-child(9){width:9%}
 }
+
+/* Offer Invoice adds percentage and monetary discount columns. */
+#invoiceItemsCard table{min-width:1030px}
+#invoiceItemsCard th:nth-child(1),#invoiceItemsCard td:nth-child(1){width:2%}
+#invoiceItemsCard th:nth-child(2),#invoiceItemsCard td:nth-child(2){width:23%}
+#invoiceItemsCard th:nth-child(3),#invoiceItemsCard td:nth-child(3){width:7%}
+#invoiceItemsCard th:nth-child(4),#invoiceItemsCard td:nth-child(4){width:6%}
+#invoiceItemsCard th:nth-child(5),#invoiceItemsCard td:nth-child(5){width:7%}
+#invoiceItemsCard th:nth-child(6),#invoiceItemsCard td:nth-child(6){width:5%}
+#invoiceItemsCard th:nth-child(7),#invoiceItemsCard td:nth-child(7){width:8%}
+#invoiceItemsCard th:nth-child(8),#invoiceItemsCard td:nth-child(8){width:7%}
+#invoiceItemsCard th:nth-child(9),#invoiceItemsCard td:nth-child(9){width:10%}
+#invoiceItemsCard th:nth-child(10),#invoiceItemsCard td:nth-child(10){width:12%;padding:4px;text-align:left}
+#invoiceItemsCard th:nth-child(11),#invoiceItemsCard td:nth-child(11){width:10%;white-space:nowrap}
+#invoiceItemsCard th:nth-child(12),#invoiceItemsCard td:nth-child(12){width:3%;text-align:center}

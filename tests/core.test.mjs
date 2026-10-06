@@ -6,14 +6,14 @@ const {calculate,validateInvoice,makePayload,decodeResponse}=core;
 const lines=[{item_id:'1234567890123456789',quantity:2,rate:100,tax:{id:'t18',name:'GST 18',percentage:18}},{item_id:'2',quantity:1,rate:50,tax:{id:'t5',name:'GST 5',percentage:5}}];
 const state={customer:{contact_id:'9876543210987654321',billing_address:{city:'Kochi'},shipping_address:{city:'Thrissur'}},lines};
 const config={invoiceQuantityMode:'pieces',customFields:{transport:{id:'cf1',label:'Transport',required:true}},requireSalesperson:true};
-const values={date:'2026-09-17',place_of_supply:'KL',salesperson_id:'s1',discount:10,discountType:'percent',rounded:false,custom:{transport:'Own delivery'},notes:'Test'};
-test('mixed tax rates and invoice percentage discount',()=>{const t=calculate(lines,10);assert.equal(t.subtotal,250);assert.equal(t.discount,25);assert.equal(t.tax,34.65);assert.equal(t.total,259.65);});
-test('absolute discount and whole-unit round off',()=>{const t=calculate(lines,25,'amount',true);assert.equal(t.total,260);assert.equal(t.adjustment,.35);});
+const values={date:'2026-09-17',place_of_supply:'KL',salesperson_id:'s1',rounded:false,custom:{transport:'Own delivery'},notes:'Test'};
+test('mixed tax rates and item percentage discounts before tax',()=>{const t=calculate(lines.map(l=>({...l,discount:10})));assert.equal(t.subtotal,250);assert.equal(t.discount,25);assert.equal(t.tax,34.65);assert.equal(t.total,259.65);});
+test('item discounts and whole-unit round off',()=>{const t=calculate(lines.map(l=>({...l,discount:10})),true);assert.equal(t.total,260);assert.equal(t.adjustment,.35);});
 test('zero subtotal remains finite',()=>assert.equal(calculate([],0).total,0));
 
 test('round off goes down through .49 and up from .50',()=>{
- assert.equal(calculate([{item_id:'x',quantity:1,pieces:1,rate:100.49}],0,'percent',true).total,100);
- assert.equal(calculate([{item_id:'x',quantity:1,pieces:1,rate:100.5}],0,'percent',true).total,101);
+ assert.equal(calculate([{item_id:'x',quantity:1,pieces:1,rate:100.49}],true).total,100);
+ assert.equal(calculate([{item_id:'x',quantity:1,pieces:1,rate:100.5}],true).total,101);
 });
 
 test('not found scan rows are ignored in totals and block save until removed',()=>{
@@ -23,9 +23,9 @@ test('not found scan rows are ignored in totals and block save until removed',()
  assert.ok(errors.some(e=>e.includes('Item not found')));
  assert.ok(errors.some(e=>e.includes('Add at least one item')));
 });
-test('reject invalid quantities and excessive discounts while allowing unmapped custom fields',()=>{const errors=validateInvoice({...state,lines:[{...lines[0],quantity:0}]},{...values,discount:110},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(errors.some(e=>e.includes('quantity')));assert.ok(errors.some(e=>e.includes('discount')));assert.ok(!errors.some(e=>e.includes('custom-field ID')));});
+test('reject invalid quantities and excessive discounts while allowing unmapped custom fields',()=>{const errors=validateInvoice({...state,lines:[{...lines[0],quantity:0,discount:110}]},{...values,discount:110},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(errors.some(e=>e.includes('quantity')));assert.ok(errors.some(e=>e.includes('discount')));assert.ok(!errors.some(e=>e.includes('custom-field ID')));});
 test('required custom fields are enforced even before their ERP field is mapped',()=>{const errors=validateInvoice(state,{...values,custom:{transport:''}},config);assert.ok(errors.some(e=>e.includes('Transport is required')));const unmapped=validateInvoice(state,{...values,custom:{transport:''}},{...config,customFields:{transport:{label:'Transport',id:'',required:true}}});assert.ok(unmapped.some(e=>e.includes('Transport is required')));});
-test('payload preserves IDs, mappings, tax IDs and links without sending email',()=>{const p=makePayload(state,{...values,shipping_address:'Manual shipping'},config);assert.equal(p.customer_id,'9876543210987654321');assert.equal(p.line_items[0].item_id,'1234567890123456789');assert.equal(p.line_items[0].tax_id,'t18');assert.equal(p.discount,'10%');assert.deepEqual(p.custom_fields,[{customfield_id:'cf1',value:'Own delivery'}]);assert.deepEqual(p.shipping_address,{address:'Manual shipping'});assert.equal(p.send,undefined);});
+test('payload preserves IDs, mappings, tax IDs and links without sending email',()=>{const p=makePayload(state,{...values,shipping_address:'Manual shipping'},config);assert.equal(p.customer_id,'9876543210987654321');assert.equal(p.line_items[0].item_id,'1234567890123456789');assert.equal(p.line_items[0].tax_id,'t18');assert.equal(p.discount,undefined);assert.equal(p.discount_type,'item_level');assert.equal(p.is_discount_before_tax,true);assert.equal(p.line_items[0].discount,'0%');assert.deepEqual(p.custom_fields,[{customfield_id:'cf1',value:'Own delivery'}]);assert.deepEqual(p.shipping_address,{address:'Manual shipping'});assert.equal(p.send,undefined);});
 test('same-as-billing uses billing address without editing the customer',()=>assert.equal(makePayload(state,{...values,sameAsBilling:true},config).shipping_address.city,'Kochi'));
 test('editable shipping address overrides customer shipping address',()=>assert.deepEqual(makePayload(state,{...values,shipping_address:'Edited Ship Address'},config).shipping_address,{address:'Edited Ship Address'}));
 test('customer shipping address is not copied unless provided or same-as-billing is checked',()=>assert.equal(makePayload(state,values,config).shipping_address,undefined));
@@ -103,4 +103,26 @@ test('packing infers set items from Zoho item category when M Unit is absent',()
  ],custom_field_hash:{cf_item_category:'3 PIECE SET',cf_ratio:'3'}};
  assert.deepEqual(core.itemPacking(item),{mu:'Set',pieces:3});
  assert.equal(calculate([{...lines[0],...core.itemPacking(item),quantity:2,rate:1095}]).subtotal,6570);
+});
+
+
+test('different item discounts reduce only their own taxable base',()=>{
+ const discounted=[{...lines[0],discount:10},{...lines[1],discount:20}];
+ const t=calculate(discounted);
+ assert.equal(t.subtotal,250);assert.equal(t.discount,30);assert.equal(t.taxable,220);
+ assert.equal(t.tax,34.4);assert.equal(t.total,254.4);
+ const p=makePayload({...state,lines:discounted},values,config);
+ assert.deepEqual(p.line_items.map(l=>l.discount),['10%','20%']);
+});
+test('discount boundaries, rounding, exemptions and invalid percentages',()=>{
+ assert.equal(calculate([{...lines[0],discount:100}]).total,0);
+ assert.equal(calculate(lines).discount,0);
+ assert.deepEqual(core.lineAmounts({quantity:3,pieces:2,rate:1.11,discount:12.5}),{gross:6.66,discount:0.83,taxable:5.83});
+ assert.equal(calculate([{...lines[0],tax:null,discount:50}]).total,100);
+ for(const discount of [-1,100.1,NaN,Infinity,'10%']) {
+  assert.ok(validateInvoice({...state,lines:[{...lines[0],discount}]},values,config).some(e=>e.includes('discount percentage')));
+ }
+ for(const discount of [0,12.5,100]) {
+  assert.deepEqual(validateInvoice({...state,lines:[{...lines[0],discount}]},values,config),[]);
+ }
 });

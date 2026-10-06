@@ -1,7 +1,7 @@
 {
   "name": "rajadhani-erp",
   "version": "1.0.0",
-  "description": "Rajadhani sales invoice widget for Zoho ERP",
+  "description": "Rajadhani Offer Invoice widget for Zoho ERP",
   "main": "index.js",
   "scripts": {
     "build": "node scripts/build.cjs",
